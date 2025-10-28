@@ -126,98 +126,272 @@ function aggiornaStatistiche(sheet, storicoPilota) {
     }
 }
 
-// Estrazione classifica piloti completa
+// Estrazione classifica piloti completa - VERSIONE CORRETTA
 function estraiClassificaPilotiCompleta(sheet) {
     const risultati = [];
     const range = XLSX.utils.decode_range(sheet['!ref']);
-    
+
+    // Trova la riga d'inizio (dopo "PILOTA")
     let startRow = -1;
     for (let R = range.s.r; R <= range.e.r; ++R) {
-        const cell = sheet[XLSX.utils.encode_cell({r: R, c: 0})];
+        const cell = sheet[XLSX.utils.encode_cell({ r: R, c: 0 })];
         if (cell && cell.v && cell.v.toString().toLowerCase().includes('pilota')) {
             startRow = R + 1;
             break;
         }
     }
-    
+
     if (startRow === -1) return risultati;
-    
+
+    // Legge i dati dei piloti
     for (let R = startRow; R <= range.e.r; ++R) {
-        const cellPilota = sheet[XLSX.utils.encode_cell({r: R, c: 0})];
-        const cellPunti = sheet[XLSX.utils.encode_cell({r: R, c: 1})];
-        const cellScuderia = sheet[XLSX.utils.encode_cell({r: R, c: 2})];
-        
+        const cellPilota = sheet[XLSX.utils.encode_cell({ r: R, c: 0 })];
+        const cellPunti = sheet[XLSX.utils.encode_cell({ r: R, c: 1 })];
+        const cellScuderia = sheet[XLSX.utils.encode_cell({ r: R, c: 2 })];
+
+        // Stop se arriviamo alla sezione TEAM
         if (cellPilota && cellPilota.v && cellPilota.v.toString().toLowerCase().includes('team')) {
             break;
         }
-        
-        if (!cellPilota || !cellPilota.v || cellPilota.v.toString().trim() === '') {
-            continue;
-        }
-        
+
+        // Salta righe vuote o non valide
+        if (!cellPilota || !cellPilota.v) continue;
+
         const pilota = cellPilota.v.toString().trim();
-        
-        if (pilota === '' || pilota.toLowerCase().includes('pilota') || pilota.toLowerCase().includes('stagione')) {
+        if (
+            pilota === '' ||
+            pilota.toLowerCase().includes('pilota') ||
+            pilota.toLowerCase().includes('stagione')
+        ) {
             continue;
         }
-        
+
         const scuderia = cellScuderia ? cellScuderia.v.toString().trim() : '';
-        
+
+        // --- CALCOLO PUNTI (stessa logica della versione funzionante) ---
         let punti = 0;
+
         if (cellPunti) {
-            if (cellPunti.f) {
-                punti = calcolaPuntiDaFormula(cellPunti.f, sheet);
-            } else if (cellPunti.v !== undefined && cellPunti.v !== null) {
-                punti = parseInt(cellPunti.v) || 0;
+            if (cellPunti.v !== undefined && cellPunti.v !== null) {
+                // Se Excel ha già salvato il valore calcolato, usiamolo
+                const val = cellPunti.v;
+
+                if (typeof val === 'number') {
+                    punti = val;
+                } else if (typeof val === 'string') {
+                    const trimmed = val.trim().toUpperCase();
+                    if (!['RIT', 'DNS', 'DNF', 'DSQ', ''].includes(trimmed)) {
+                        const num = Number(trimmed.replace(',', '.'));
+                        if (!isNaN(num)) punti = num;
+                    }
+                }
+            } else if (cellPunti.f) {
+                // Se c'è solo una formula, usa la funzione calcolaPuntiDaFormula migliorata
+                punti = calcolaPuntiDaFormulaCompleta(cellPunti.f, sheet);
             }
         }
-        
-        if (pilota && pilota !== 'PILOTA') {
+
+        // Se abbiamo trovato un pilota valido, aggiungilo
+        if (pilota && punti >= 0) {
+            // Arrotonda solo se serve a mostrare mezzi punti (es. 67.5)
+            const puntiArrotondati = Math.round(punti * 10) / 10;
             risultati.push({
                 Pilota: pilota,
                 Scuderia: scuderia,
-                Punti: punti
+                Punti: puntiArrotondati
             });
+        }
+    }
+
+    console.log("Classifica piloti estratta:", risultati);
+    return risultati;
+}
+
+// Versione migliorata di calcolaPuntiDaFormula per la classifica completa
+function calcolaPuntiDaFormulaCompleta(formula, sheet) {
+    // Estrai i riferimenti delle celle dalla formula
+    const matches = formula.match(/[A-Z]+\d+/g);
+    if (!matches) {
+        // Se non ci sono riferimenti a celle, prova a estrarre numeri direttamente
+        const numberMatches = formula.match(/\d+\.?\d*/g);
+        return numberMatches ? numberMatches.reduce((sum, num) => sum + parseFloat(num), 0) : 0;
+    }
+    
+    let totale = 0;
+    
+    matches.forEach(ref => {
+        const cell = sheet[ref];
+        if (cell) {
+            if (cell.v !== undefined && cell.v !== null) {
+                // Se è un numero
+                if (typeof cell.v === 'number') {
+                    totale += cell.v;
+                } 
+                // Se è una stringa, controlla se è un numero o "RIT"
+                else if (typeof cell.v === 'string') {
+                    const trimmed = cell.v.trim().toUpperCase();
+                    if (trimmed === 'RIT' || trimmed === '' || trimmed === 'DNS' || trimmed === 'DNF') {
+                        // Ritirato = 0 punti
+                        totale += 0;
+                    } else {
+                        // Prova a convertire in numero
+                        const num = parseFloat(trimmed);
+                        if (!isNaN(num)) {
+                            totale += num;
+                        }
+                    }
+                }
+            }
+        }
+    });
+    
+    // Aggiungi eventuali numeri direttamente nella formula (mezzi punti)
+    const directNumbers = formula.match(/\b\d+\.?\d*\b/g);
+    if (directNumbers) {
+        directNumbers.forEach(numStr => {
+            // Evita di contare due volte i numeri già presi dalle celle
+            if (!formula.includes('Z' + numStr)) {
+                const num = parseFloat(numStr);
+                if (!isNaN(num)) {
+                    totale += num;
+                }
+            }
+        });
+    }
+    
+    return totale;
+}
+
+// Calcolo posizione in classifica con spareggi completi
+function calcolaPosizioneInClassifica(nomePilota, classificaPiloti, sheet) {
+    if (!classificaPiloti || classificaPiloti.length === 0) {
+        return "-";
+    }
+    
+    // Ottieni i risultati completi di ogni pilota per gli spareggi
+    const classificaConRisultati = classificaPiloti.map(pilota => {
+        const risultati = ottieniRisultatiPilota(pilota.Pilota, sheet);
+        return {
+            ...pilota,
+            risultati: risultati,
+            vittorie: contaPosizioni(risultati, 1),
+            secondi: contaPosizioni(risultati, 2),
+            terzi: contaPosizioni(risultati, 3),
+            quarti: contaPosizioni(risultati, 4),
+            quinti: contaPosizioni(risultati, 5)
+        };
+    });
+    
+    // Ordina con spareggi completi
+    const classificaOrdinata = [...classificaConRisultati].sort((a, b) => {
+        const puntiA = a.Punti || 0;
+        const puntiB = b.Punti || 0;
+        
+        // 1. Ordina per punti (discendente)
+        if (puntiB !== puntiA) {
+            return puntiB - puntiA;
+        }
+        
+        // 2. SPAREGGIO: maggior numero di vittorie
+        if (b.vittorie !== a.vittorie) {
+            return b.vittorie - a.vittorie;
+        }
+        
+        // 3. SPAREGGIO: maggior numero di secondi posti
+        if (b.secondi !== a.secondi) {
+            return b.secondi - a.secondi;
+        }
+        
+        // 4. SPAREGGIO: maggior numero di terzi posti
+        if (b.terzi !== a.terzi) {
+            return b.terzi - a.terzi;
+        }
+        
+        // 5. SPAREGGIO: maggior numero di quarti posti
+        if (b.quarti !== a.quarti) {
+            return b.quarti - a.quarti;
+        }
+        
+        // 6. SPAREGGIO: maggior numero di quinti posti
+        if (b.quinti !== a.quinti) {
+            return b.quinti - a.quinti;
+        }
+        
+        // 7. SPAREGGIO: risultato migliore nell'ultima gara
+        const ultimoRisultatoA = ottieniUltimoRisultatoValido(a.risultati);
+        const ultimoRisultatoB = ottieniUltimoRisultatoValido(b.risultati);
+        if (ultimoRisultatoA !== ultimoRisultatoB) {
+            return ultimoRisultatoA - ultimoRisultatoB; // Posizione più bassa = meglio
+        }
+        
+        // 8. Se tutto è uguale, ordine alfabetico inverso (Z-A) come ultimo spareggio
+        return b.Pilota.localeCompare(a.Pilota);
+    });
+    
+    // Cerca il pilota
+    const nomeCercato = nomePilota.trim().toLowerCase();
+    const posizione = classificaOrdinata.findIndex(pilota => {
+        if (!pilota.Pilota) return false;
+        return pilota.Pilota.toString().trim().toLowerCase() === nomeCercato;
+    });
+    
+    return posizione !== -1 ? posizione + 1 : "-";
+}
+
+// Funzioni helper per gli spareggi
+function ottieniRisultatiPilota(nomePilota, sheet) {
+    const range = XLSX.utils.decode_range(sheet['!ref']);
+    const risultati = [];
+    
+    // Trova la riga del pilota
+    let rigaPilota = -1;
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        const cell = sheet[XLSX.utils.encode_cell({r: R, c: 0})];
+        if (cell && cell.v && cell.v.toString().trim().toLowerCase() === nomePilota.trim().toLowerCase()) {
+            rigaPilota = R;
+            break;
+        }
+    }
+    
+    if (rigaPilota === -1) {
+        return risultati;
+    }
+    
+    // Estrai i risultati dalle colonne delle gare (da colonna 3 in poi)
+    for (let C = 3; C <= range.e.c; ++C) {
+        const cell = sheet[XLSX.utils.encode_cell({r: rigaPilota, c: C})];
+        if (cell && cell.v !== undefined && cell.v !== null) {
+            if (typeof cell.v === 'number') {
+                risultati.push(cell.v);
+            } else if (typeof cell.v === 'string') {
+                const trimmed = cell.v.trim().toUpperCase();
+                if (trimmed === 'RIT' || trimmed === 'DNS' || trimmed === 'DNF') {
+                    risultati.push(999); // Ritirato = valore alto per l'ordinamento
+                } else {
+                    const num = parseInt(trimmed);
+                    if (!isNaN(num)) {
+                        risultati.push(num);
+                    } else {
+                        risultati.push(999); // Valore non numerico = ritirato
+                    }
+                }
+            }
+        } else {
+            risultati.push(999); // Cella vuota = ritirato
         }
     }
     
     return risultati;
 }
 
-// Calcolo punti da formula
-function calcolaPuntiDaFormula(formula, sheet) {
-    const matches = formula.match(/[A-Z]+\d+/g);
-    if (!matches) return 0;
-    
-    let totale = 0;
-    
-    matches.forEach(ref => {
-        const cell = sheet[ref];
-        if (cell && cell.v) {
-            totale += parseInt(cell.v) || 0;
-        }
-    });
-    
-    return totale;
+function contaPosizioni(risultati, posizione) {
+    return risultati.filter(pos => pos === posizione).length;
 }
 
-// Calcolo posizione in classifica
-function calcolaPosizioneInClassifica(nomePilota, classificaPiloti) {
-    if (!classificaPiloti || classificaPiloti.length === 0) {
-        return "-";
-    }
-    
-    const classificaOrdinata = [...classificaPiloti].sort((a, b) => {
-        const puntiA = a.Punti || 0;
-        const puntiB = b.Punti || 0;
-        return puntiB - puntiA;
-    });
-    
-    const posizione = classificaOrdinata.findIndex(pilota => 
-        pilota.Pilota && pilota.Pilota.toString().trim() === nomePilota.trim()
-    );
-    
-    return posizione !== -1 ? posizione + 1 : "-";
+function ottieniUltimoRisultatoValido(risultati) {
+    // Filtra solo i risultati validi (non ritiri) e prendi l'ultimo
+    const risultatiValidi = risultati.filter(pos => pos < 999);
+    return risultatiValidi.length > 0 ? risultatiValidi[risultatiValidi.length - 1] : 999;
 }
 
 // Creazione infobox
@@ -242,7 +416,7 @@ function createTabellaPilota(pilota) {
 }
 
 // Creazione tabella storico gare con posizione in campionato
-function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti) {
+function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, sheet) {
     if (!storicoPilota) {
         const errorDiv = document.createElement('div');
         errorDiv.textContent = "Dati pilota non disponibili";
@@ -254,7 +428,7 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti) 
     const moto = storicoPilota[2] || "N/D";
     const gareRisultati = storicoPilota.slice(3);
 
-    const posizione = calcolaPosizioneInClassifica(nome, classificaPiloti);
+    const posizione = calcolaPosizioneInClassifica(nome, classificaPiloti, sheet);
 
     const table = document.createElement('table');
     table.className = "wikitable";
@@ -331,10 +505,10 @@ async function main() {
         const storicoContainer = document.getElementById('storico-container');
         if (storicoContainer) {
             if (storicoBonelli) {
-                storicoContainer.appendChild(createTabellaStorico(storicoBonelli, anno, categoria, classificaPiloti));
+                storicoContainer.appendChild(createTabellaStorico(storicoBonelli, anno, categoria, classificaPiloti, sheet));
             }
             if (storicoGabrielli) {
-                storicoContainer.appendChild(createTabellaStorico(storicoGabrielli, anno, categoria, classificaPiloti));
+                storicoContainer.appendChild(createTabellaStorico(storicoGabrielli, anno, categoria, classificaPiloti, sheet));
             }
         }
 
