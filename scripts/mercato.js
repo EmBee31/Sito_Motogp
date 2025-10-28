@@ -1,6 +1,6 @@
 // ../scripts/mercato.js
 
-fetch("../docs/mercato.txt")
+fetch("../Sito_Motogp/docs/mercato.txt")
   .then(response => {
     if (!response.ok) {
       throw new Error("Errore nel caricamento del file: " + response.status);
