@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AngoloMotoNews</title>
+    <link rel="stylesheet" href="../styles/stylenews.css">
+</head>
+<body>
+    <nav class="navbar">
+        <ul>
+            <a href="../index.html">Home</a>
+            <a href="calendario.html">Calendario</a>
+            <a href="classifica.html">Classifica</a>
+            <a href="piloti.html">Piloti</a>
+        </ul>
+    </nav>
+    <img src="../immagini/loghi/banner.jpg" alt="Banner AngoloMoto" class="banner">
+    
+    <section class="header_content">
+        <h1>Notizie Aggiornate</h1>
+        <p>Rimani sempre informato con le ultime novità dal mondo delle moto.</p>
+    </section>
+
+    <!-- Prima fila -->
+    <div class="flags-1">
+        <div class="flag-card-1" data-gara="lusail">
+            <img src="https://flagcdn.com/w80/qa.png" width="80" height="31" alt="Lusail">
+            <span>Lusail</span>
+        </div>
+        <div class="flag-card-1" data-gara="portimao">
+            <img src="https://flagcdn.com/w80/pt.png" width="80" height="31" alt="Portimão">
+            <span>Portimão</span>
+        </div>
+        <div class="flag-card-1" data-gara="americhe">
+            <img src="https://flagcdn.com/w80/us-tx.png" width="80" height="31" alt="Americhe">
+            <span>Americhe</span>
+        </div>
+        <div class="flag-card-1" data-gara="jerez">
+            <img src="https://flagcdn.com/w80/es.png" width="80" height="31" alt="Jerez">
+            <span>Jerez</span>
+        </div>
+        <div class="flag-card-1" data-gara="lemans">
+            <img src="https://flagcdn.com/w80/fr.png" width="80" height="31" alt="Le Mans">
+            <span>Le Mans</span>
+        </div>
+        <div class="flag-card-1" data-gara="catalogna1">
+            <img src="https://flagcdn.com/w80/es.png" width="80" height="31" alt="Catalogna">
+            <span>Catalogna 1</span>
+        </div>
+    </div>
+
+    <!-- Seconda fila -->
+    <div class="flags-2">
+        <div class="flag-card-2" data-gara="mugello">
+            <img src="https://flagcdn.com/w80/it.png" width="80" height="31" alt="Mugello">
+            <span>Mugello</span>
+        </div>
+        <div class="flag-card-2" data-gara="assen">
+            <img src="https://flagcdn.com/w80/nl.png" width="80" height="31" alt="Assen">
+            <span>Assen</span>
+        </div>
+        <div class="flag-card-2" data-gara="sachsenring">
+            <img src="https://flagcdn.com/w80/de.png" width="80" height="31" alt="Sachsenring">
+            <span>Sachsenring</span>
+        </div>
+        <div class="flag-card-2" data-gara="silverstone">
+            <img src="https://flagcdn.com/w80/gb.png" width="80" height="31" alt="Silverstone">
+            <span>Silverstone</span>
+        </div>
+        <div class="flag-card-2" data-gara="redbullring">
+            <img src="https://flagcdn.com/w80/at.png" width="80" height="31" alt="Red Bull Ring">
+            <span>Red Bull Ring</span>
+        </div>
+        <div class="flag-card-2" data-gara="aragon">
+            <img src="https://flagcdn.com/w80/es.png" width="80" height="31" alt="Aragón">
+            <span>Aragón</span>
+        </div>
+        <div class="flag-card-2" data-gara="misano1">
+            <img src="https://flagcdn.com/w80/sm.png" width="80" height="31" alt="Misano">
+            <span>Misano 1</span>
+        </div>
+    </div>
+
+    <!-- Terza fila -->
+    <div class="flags-3">
+        <div class="flag-card-3" data-gara="misano2">
+            <img src="https://flagcdn.com/w80/sm.png" width="80" height="31" alt="Misano">
+            <span>Misano 2</span>
+        </div>
+        <div class="flag-card-3" data-gara="mandalika">
+            <img src="https://flagcdn.com/w80/id.png" width="80" height="31" alt="Mandalika">
+            <span>Mandalika</span>
+        </div>
+        <div class="flag-card-3" data-gara="motegi">
+            <img src="https://flagcdn.com/w80/jp.png" width="80" height="31" alt="Motegi">
+            <span>Motegi</span>
+        </div>
+        <div class="flag-card-3" data-gara="phillipisland">
+            <img src="https://flagcdn.com/w80/au.png" width="80" height="31" alt="Phillip Island">
+            <span>Phillip Island</span>
+        </div>
+        <div class="flag-card-3" data-gara="buriram">
+            <img src="https://flagcdn.com/w80/th.png" width="80" height="31" alt="Buriram">
+            <span>Buriram</span>
+        </div>
+        <div class="flag-card-3" data-gara="sepang">
+            <img src="https://flagcdn.com/w80/my.png" width="80" height="31" alt="Sepang">
+            <span>Sepang</span>
+        </div>
+        <div class="flag-card-3" data-gara="catalogna2">
+            <img src="https://flagcdn.com/w80/es.png" width="80" height="31" alt="Catalogna">
+            <span>Catalogna 2
+
+            </span>
+        </div>
+    </div>
+
+    <section class="track-info">
+        <div class="track-image-container">
+            <img id="track-image" src="" alt="Circuito" class="track-image">
+            <div class="track-date" id="track-date"></div>
+            <button id="btn-risultati" class="risultati-btn"><span>🏁RISULTATI🏁</span></button>
+        </div>
+    </section>
+
+    <section class="news_header">
+        <h1>LE ULTIME NEWS!</h1>
+    </section>
+    
+    <div id="contenuto-testo"></div>
+    
+    <script src="../scripts/calendario.js"></script>
+
+    <footer>
+        <p>&copy; 2025 AngoloMoto. Tutti i diritti riservati.</p>
+    </footer>
+</body>
+</html>

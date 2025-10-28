@@ -1,0 +1,526 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.navbar {
+    width: 100%;
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    gap: 50px;
+    padding: 15px 0;
+    position: absolute;
+    top: 0;
+    z-index: 1000;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    transition: color 0.3s;
+    margin: 0 50px;
+}
+
+.navbar a:hover {
+    color: #ff5e00;
+}
+
+.banner {
+    width: 100%;
+    height: 700px;
+    object-fit: fill;
+    display: block;
+}
+
+.nav {
+    margin-top: 40px;
+}
+
+.header_content {
+    text-align: center;
+    color: #333;
+    padding: 20px 20px;
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Flag cards */
+.flag-card-1, .flag-card-2, .flag-card-3 {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background: rgb(225, 220, 216);
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 150px;
+    text-align: center;
+}
+
+.flag-card-1:hover, .flag-card-2:hover, .flag-card-3:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.flag-card-1.active, .flag-card-2.active, .flag-card-3.active {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(227, 6, 19, 0.3);
+    border: 2px solid #e30613;
+    background: rgb(225, 220, 216);
+}
+
+.flag-card-1 img, .flag-card-2 img, .flag-card-3 img {
+    width: 100%;
+    height: 70px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.flag-card-1 span, .flag-card-2 span, .flag-card-3 span {
+    display: block;
+    text-align: center;
+    color: #0078d7;
+    font-weight: bold;
+    font-size: 16px;
+    transition: color 0.3s ease;
+}
+
+.flag-card-1:hover span, .flag-card-2:hover span, .flag-card-3:hover span {
+    color: #004c94;
+}
+
+/* Layout delle righe di bandiere */
+.flags-1, .flags-2, .flags-3 {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+    padding: 40px;
+    margin-bottom: 20px;
+}
+
+/* Box principale a scacchi - contiene TUTTO */
+#contenuto-testo {
+    text-align: center;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 1000px;
+    font-size: 18px;
+    line-height: 1.6;
+    color: #333;
+    font-family: 'Times New Roman';
+    background: 
+        repeating-linear-gradient(
+            45deg,
+            #000,
+            #000 15px,
+            #fff 15px,
+            #fff 30px
+        );
+    border: 4px solid #000;
+    border-radius: 12px;
+    padding: 30px;
+    position: relative;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Sfondo bianco semitrasparente per tutto il contenuto */
+#contenuto-testo::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    z-index: 1;
+}
+
+/* Posiziona TUTTO il contenuto sopra lo sfondo a scacchi */
+#contenuto-testo > * {
+    position: relative;
+    z-index: 2;
+}
+
+/* Stili per i paragrafi del riassunto */
+#contenuto-testo p {
+    margin-top: 0;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    font-family: inherit;
+    margin-bottom: 1.5em;
+}
+
+#contenuto-testo i {
+    font-style: italic;
+}
+
+/* CITAZIONI - dentro la box a scacchi ma con stile migliorato */
+.quote-section {
+    display: flex;
+    align-items: flex-start;
+    margin: 2em 0;
+    padding: 1.5em;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border: 2px solid #007bff;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+.quote-section::before {
+    content: '"';
+    position: absolute;
+    top: -10px;
+    left: 15px;
+    font-size: 80px;
+    color: rgba(0, 123, 255, 0.1);
+    font-family: Georgia, serif;
+    z-index: 1;
+}
+
+.quote-logo {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin-right: 1.5em;
+    object-fit: cover;
+    border: 3px solid #007bff;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+    z-index: 2;
+    position: relative;
+}
+
+.quote-content {
+    flex: 1;
+    z-index: 2;
+    position: relative;
+}
+
+.quote-content blockquote {
+    margin: 0 0 0.8em 0;
+    font-style: italic;
+    color: #2c3e50;
+    line-height: 1.6;
+    font-size: 1.1em;
+    font-weight: 500;
+}
+
+.quote-content cite {
+    display: block;
+    font-style: normal;
+    font-weight: bold;
+    color: #007bff;
+    font-size: 1em;
+    text-align: right;
+    padding-right: 10px;
+}
+
+/* TABELLE PAGELLE - dentro la box a scacchi ma con stile migliorato */
+.table-section {
+    margin: 3em 0;
+    padding: 25px;
+    background: linear-gradient(135deg, #ffffff 0%, #5b498f 100%);
+    border-radius: 12px;
+    border: 3px solid #e19499;
+    box-shadow: 0 6px 20px rgba(227, 6, 19, 0.3);
+    color: #fff;
+    position: relative;
+}
+
+/* Titolo */
+.table-title {
+    text-align: center;
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #335992;
+    margin-bottom: 1.5em;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+/* Tabella */
+.rating-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+/* Intestazioni */
+.rating-table th {
+    background: linear-gradient(135deg, #18277c 0%, #c40511 100%);
+    color: #fff;
+    padding: 1em;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+    border-left: 2px solid rgba(255,255,255,0.2);
+    border-right: 2px solid rgba(255,255,255,0.2);
+}
+
+/* Colonne voti e descrizione centrate */
+.rating-table th.voto-th,
+.rating-table th.desc-th {
+    text-align: center;
+}
+
+/* Righe */
+.rating-table tr {
+    border-bottom: 1px solid #444;
+    transition: all 0.2s ease;
+}
+
+.rating-table tr:hover {
+    background: rgba(227, 6, 19, 0.1);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Celle */
+.rating-table td {
+    padding: 1em;
+    display: table-cell;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 1em;
+}
+
+
+/* Immagine pilota */
+.pilota-image {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #e30613;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+/* Nome pilota */
+.rating-table td.pilota-cell {
+    font-weight: bold;
+    font-size: 1.1em;
+    color: #290c51;
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+    gap: 10px;
+}
+
+/* Colonna voto */
+.rating-table td.voto-cell {
+    font-weight: bold;
+    font-size: 1.3em;
+    color: #930808;
+    border-left: 2px solid #444;
+    border-right: 2px solid #444;
+}
+
+/* Colonna descrizione */
+.rating-table td.desc-cell {
+    text-align: left;
+    font-size: 0.95em;
+    line-height: 1.4;
+    font-weight: bold;
+    color: #000000;
+}
+
+/* Rimuove bordo ultima riga */
+.rating-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .rating-table th, .rating-table td {
+        font-size: 0.9em;
+        padding: 0.8em;
+    }
+
+    .pilota-image {
+        width: 40px;
+        height: 40px;
+    }
+
+    .rating-table td.desc-cell {
+        text-align: center;
+    }
+}
+
+.pilota-cell {
+    display: flex;
+    align-items: center;
+    gap: 1em;
+}
+
+.pilota-image {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #e30613;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+
+.news_header {
+    text-align: center;
+    color: #a40f0f;
+    padding: 20px 20px;
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 0 auto;
+    margin-top: 350px;
+}
+
+/* Sezione pista e data */
+.track-info {
+    text-align: center;
+    margin: 50px auto 30px auto;
+    max-width: 800px;
+    padding: 0 20px;
+}
+
+.track-image:not([src]), .track-image[src=""] {
+    display: none;
+}
+
+.track-date:empty {
+    display: none;
+}
+
+.track-image {
+    width: 100%;
+    max-width: 700px;
+    height: auto;
+    border-radius: 8px;
+}
+
+.track-date {
+    margin-top: 20px;
+    color: #333;
+    font-weight: 900;
+    font-size: 36px;
+    text-align: center;
+    font-family: 'Arial Black', 'Arial Bold', Arial, sans-serif;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Pulsante Risultati */
+.risultati-btn {
+    margin-top: 25px;
+    padding: 15px 40px;
+    background: 
+        linear-gradient(45deg, 
+            #111111 0%, #111111 25%,
+            #fff 25%, #fff 50%, 
+            #111111 50%, #111111 75%,
+            #fff 75%, #fff 100%);
+    background-size: 20px 20px;
+    color: #000;
+    border: 3px solid #111111;
+    border-radius: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+}
+
+.risultati-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    z-index: 1;
+    border-radius: 5px;
+}
+
+.risultati-btn span {
+    position: relative;
+    z-index: 2;
+}
+
+.risultati-btn:hover::before {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.risultati-btn:hover span {
+    color: #fff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .flags-1, .flags-2, .flags-3 {
+        gap: 15px;
+        padding: 20px;
+    }
+    
+    .flag-card-1, .flag-card-2, .flag-card-3 {
+        width: 130px;
+    }
+    
+    #contenuto-testo {
+        width: 95%;
+        padding: 20px 15px;
+        margin: 15px auto;
+    }
+    
+    #contenuto-testo::before {
+        top: 8px;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+    }
+    
+    .quote-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .quote-logo {
+        margin-right: 0;
+        margin-bottom: 1em;
+    }
+    
+    .table-section {
+        padding: 15px;
+    }
+    
+    .rating-table {
+        font-size: 0.9em;
+    }
+    
+    .track-image {
+        max-width: 90%;
+    }
+    
+    .track-date {
+        font-size: 28px;
+    }
+    
+    .risultati-btn {
+        padding: 12px 30px;
+        font-size: 16px;
+    }
+}

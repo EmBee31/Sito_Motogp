@@ -1,0 +1,189 @@
+/* Reset base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+.navbar {
+    width: 100%;
+    background-color: rgba(0,0,0,0.7); /* semi-trasparente */
+    display: flex;        /* disposizione orizzontale */
+    justify-content: center; /* centra i link */
+    gap: 50px;            /* distanza tra i link */
+    padding: 15px 0;
+    position: absolute;   /* sopra il banner */
+    top: 0;
+    z-index: 1000;
+    
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 18px;
+    transition: color 0.3s;
+    margin: 0 50px; /* distanza fissa tra i link */
+  }
+
+.navbar a:hover {
+    color: #ff5e00;
+}
+
+.banner {
+    width: 100%;
+    height: 700px;
+    object-fit: fill;
+    display: block;
+}
+
+/* Container tabelle */
+.tabelle-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 30px;
+    padding: 30px 10px;
+}
+
+/* Tabelle generiche */
+table {
+    border-collapse: collapse;
+    margin: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    width: 100%;
+    max-width: 900px;
+}
+
+/* Celle e bordi */
+table, th, td {
+    border: 1px solid #ccc;
+    padding: 12px;
+    text-align: center;
+}
+
+/* Infobox pilota (verticale) */
+.infobox {
+    width: 280px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+.infobox th {
+    background-color: #2c3e50;
+    font-size: 16px;
+    padding: 12px;
+}
+
+.infobox th:first-child {
+    color: #fff; /* Nome bianco */
+    background-color: #2c3e50; /* Manteniamo lo sfondo blu scuro */
+    font-size: 18px;
+}
+
+.infobox td {
+    font-size: 14px;
+    padding: 10px;
+}
+
+/* Tabella storico gare (orizzontale) */
+.wikitable {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 1000px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.wikitable th {
+    background-color: #2c3e50;  /* blu più chiaro e leggibile */
+    color: #fff;
+    font-weight: 600;
+    padding: 12px;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.wikitable td {
+    font-size: 14px;
+    padding: 10px;
+}
+
+/* Hover sulle righe */
+.wikitable tr:hover {
+    background-color: #f2f2f2;
+}
+
+/* Righe alternate */
+.wikitable tbody tr:nth-child(even) {
+    background-color: #fafafa;
+}
+
+.wikitable tbody tr:nth-child(odd) {
+    background-color: #ffffff;
+}
+
+/* Colori posizioni - Stile Wikipedia */
+.posizione-1 {
+    background-color: #FFD700; /* Oro */
+    color: #000;
+    font-weight: bold;
+}
+
+.posizione-2 {
+    background-color: #C0C0C0; /* Argento */
+    color: #000;
+    font-weight: bold;
+}
+
+.posizione-3 {
+    background-color: #CD7F32; /* Bronzo */
+    color: #fff;
+    font-weight: bold;
+}
+
+/* Stile Wikipedia per posizioni a punti */
+.posizione-punti {
+    background-color: #DFD; /* Verde chiaro di Wikipedia */
+    color: #000;
+}
+
+/* Stile Wikipedia per ritirati */
+.ritirato {
+    background-color: #FDD; /* Rosso chiaro di Wikipedia */
+    color: #000;
+}
+
+/* Stile Wikipedia per non classificati/assenti */
+.non-classificato {
+    background-color: #EEE; /* Grigio chiaro di Wikipedia */
+    color: #666;
+    font-style: italic;
+}
+
+/* Celle minime uniformi */
+.wikitable th, .wikitable td, .infobox th, .infobox td {
+    min-width: 60px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .tabelle-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .navbar ul {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .banner {
+        height: 400px;
+    }
+    .infobox, .wikitable {
+        max-width: 95%;
+    }
+}
