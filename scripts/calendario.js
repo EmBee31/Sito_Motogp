@@ -363,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
         quoteDiv.className = "quote-section";
 
         const img = document.createElement("img");
-        const sourceKey = source.trim().toLowerCase().replace(/\s+/g, '-');
+        const sourceKey = source.trim().toLowerCase().replace(/[\s\.]+/g, '');
         img.src = `../immagini/loghi/${sourceKey}.jpg`;
         img.alt = source;
         img.className = "quote-logo";
