@@ -14,89 +14,212 @@ document.addEventListener("DOMContentLoaded", () => {
     nascondiTrackInfo();
     console.log("Flag cards trovate:", flagCards.length);
 
-    // Mappa delle piste con immagini e date
-    const trackData = {
-        'lusail': {
-            image: '../immagini/piste/lusail.jpg',
-            date: '8-10 Marzo 2024'
-        },
-        'portimao': {
-            image: '../immagini/piste/portimao.jpg', 
-            date: '22-24 Marzo 2024'
-        },
-        'americhe': {
-            image: '../immagini/piste/americhe.jpg',
-            date: '12-14 Aprile 2024'
-        },
-        'jerez': {
-            image: '../immagini/piste/jerez.jpg',
-            date: '26-28 Aprile 2024'
-        },
-        'lemans': {
-            image: '../immagini/piste/lemans.jpg',
-            date: '10-12 Maggio 2024'
-        },
-        'catalogna1': {
-            image: '../immagini/piste/catalogna.jpg',
-            date: '24-26 Maggio 2024'
-        },
-        'mugello': {
-            image: '../immagini/piste/mugello.jpg',
-            date: '31 Maggio - 2 Giugno 2024'
-        },
-        'assen': {
-            image: '../immagini/piste/assen.jpg',
-            date: '28-30 Giugno 2024'
-        },
-        'sachsenring': {
-            image: '../immagini/piste/sachsenring.jpg',
-            date: '5-7 Luglio 2024'
-        },
-        'silverstone': {
-            image: '../immagini/piste/silverstone.jpg',
-            date: '2-4 Agosto 2024'
-        },
-        'redbullring': {
-            image: '../immagini/piste/redbullring.jpg',
-            date: '16-18 Agosto 2024'
-        },
-        'aragon': {
-            image: '../immagini/piste/aragon.jpg',
-            date: '30 Agosto - 1 Settembre 2024'
-        },
-        'misano1': {
-            image: '../immagini/piste/misano.jpg',
-            date: '6-8 Settembre 2024'
-        },
-        'misano2': {
-            image: '../immagini/piste/misano.jpg',
-            date: '20-22 Settembre 2024'
-        },
-        'mandalika': {
-            image: '../immagini/piste/mandalika.jpg',
-            date: '27-29 Settembre 2024'
-        },
-        'motegi': {
-            image: '../immagini/piste/motegi.jpg',
-            date: '4-6 Ottobre 2024'
-        },
-        'phillipisland': {
-            image: '../immagini/piste/phillipisland.jpg',
-            date: '18-20 Ottobre 2024'
-        },
-        'buriram': {
-            image: '../immagini/piste/buriram.jpg',
-            date: '25-27 Ottobre 2024'
-        },
-        'sepang': {
-            image: '../immagini/piste/sepang.jpg',
-            date: '1-3 Novembre 2024'
-        },
-        'catalogna2': {
-            image: '../immagini/piste/catalogna.jpg',
-            date: '15-17 Novembre 2024'
+    function getBasePath() {
+        const nomePagina = window.location.pathname.split('/').pop();
+
+        if (nomePagina.includes('2024')) {
+            return '../../docs/moto3/';
+        } else if (nomePagina.includes('2025')) {
+            return '../../docs/moto2/';
+        }else {
+            return '../../docs/motogp/';
         }
-    };
+    }
+
+    function getAnno(){
+        const nomePagina = window.location.pathname.split('/').pop();
+        if (nomePagina.includes('2024')) {
+            return '2024';
+        }
+        return nomePagina.includes('2025') ? '2025' : '2026';
+    }
+
+
+
+    function getTrackDatas(anno){
+        if (anno === '2024') {
+            return {
+                    'lusail': {
+                        image: '../../immagini/piste/lusail.jpg',
+                        date: '8-10 Marzo 2024'
+                    },
+                    'portimao': {
+                        image: '../../immagini/piste/portimao.jpg', 
+                        date: '22-24 Marzo 2024'
+                    },
+                    'americhe': {
+                        image: '../../immagini/piste/americhe.jpg',
+                        date: '12-14 Aprile 2024'
+                    },
+                    'jerez': {
+                        image: '../../immagini/piste/jerez.jpg',
+                        date: '26-28 Aprile 2024'
+                    },
+                    'lemans': {
+                        image: '../../immagini/piste/lemans.jpg',
+                        date: '10-12 Maggio 2024'
+                    },
+                    'catalogna1': {
+                        image: '../../immagini/piste/catalogna.jpg',
+                        date: '24-26 Maggio 2024'
+                    },
+                    'mugello': {
+                        image: '../../immagini/piste/mugello.jpg',
+                        date: '31 Maggio - 2 Giugno 2024'
+                    },
+                    'assen': {
+                        image: '../../immagini/piste/assen.jpg',
+                        date: '28-30 Giugno 2024'
+                    },
+                    'sachsenring': {
+                        image: '../../immagini/piste/sachsenring.jpg',
+                        date: '5-7 Luglio 2024'
+                    },
+                    'silverstone': {
+                        image: '../../immagini/piste/silverstone.jpg',
+                        date: '2-4 Agosto 2024'
+                    },
+                    'redbullring': {
+                        image: '../../immagini/piste/redbullring.jpg',
+                        date: '16-18 Agosto 2024'
+                    },
+                    'aragon': {
+                        image: '../../immagini/piste/aragon.jpg',
+                        date: '30 Agosto - 1 Settembre 2024'
+                    },
+                    'misano1': {
+                        image: '../../immagini/piste/misano.jpg',
+                        date: '6-8 Settembre 2024'
+                    },
+                    'misano2': {
+                        image: '../../immagini/piste/misano.jpg',
+                        date: '20-22 Settembre 2024'
+                    },
+                    'mandalika': {
+                        image: '../../immagini/piste/mandalika.jpg',
+                        date: '27-29 Settembre 2024'
+                    },
+                    'motegi': {
+                        image: '../../immagini/piste/motegi.jpg',
+                        date: '4-6 Ottobre 2024'
+                    },
+                    'phillipisland': {
+                        image: '../../immagini/piste/phillipisland.jpg',
+                        date: '18-20 Ottobre 2024'
+                    },
+                    'buriram': {
+                        image: '../../immagini/piste/buriram.jpg',
+                        date: '25-27 Ottobre 2024'
+                    },
+                    'sepang': {
+                        image: '../../immagini/piste/sepang.jpg',
+                        date: '1-3 Novembre 2024'
+                    },
+                    'catalogna2': {
+                        image: '../../immagini/piste/catalogna.jpg',
+                        date: '15-17 Novembre 2024'
+                    }
+                };
+        } else if (anno === '2025') {
+            return {
+                'buriram': {
+                    image: '../../immagini/piste/buriram.jpg',
+                    date: '28 Febbrario - 2 Marzo 2025'
+                },
+                'termas': {
+                    image: '../../immagini/piste/termasderiohondo.jpg',
+                    date: '14-16 Marzo 2025'
+                },
+                'americhe': {
+                    image: '../../immagini/piste/americhe.jpg',
+                    date: '28-30 Marzo 2025'
+                },
+                'lusail': {
+                    image: '../../immagini/piste/lusail.jpg', 
+                    date: '11-13 Aprile 2025'
+                },
+                'jerez': {
+                    image: '../../immagini/piste/jerez.jpg',
+                    date: '25-27 Aprile 2025'
+                },
+                'lemans': {
+                    image: '../../immagini/piste/lemans.jpg',
+                    date: '9-11 Maggio 2025'
+                },
+                'silverstone': {
+                    image: '../../immagini/piste/silverstone.jpg',
+                    date: '23-25 Maggio 2025'
+                },
+                'aragon': {
+                    image: '../../immagini/piste/aragon.jpg',
+                    date: '6-8 Giugno 2025'
+                },
+                'mugello': {
+                    image: '../../immagini/piste/mugello.jpg',
+                    date: '20-22 Giugno 2025'
+                },
+                'assen': {
+                    image: '../../immagini/piste/assen.jpg',
+                    date: '27-29 Giugno 2025'
+                },
+                'sachsenring': {
+                    image: '../../immagini/piste/sachsenring.jpg',
+                    date: '11-13 Luglio 2025'
+                },
+                'brno': {
+                    image: '../../immagini/piste/brno.jpg',
+                    date: '18-20 Luglio 2025'
+                },
+                'redbullring': {
+                    image: '../../immagini/piste/redbullring.jpg',
+                    date: '15-17 Agosto 2025'
+                },
+                'buddh': {
+                    image: '../../immagini/piste/buddh.jpg',
+                    date: '22-24 Agosto 2025'
+                },
+                'catalogna': {
+                    image: '../../immagini/piste/catalogna.jpg',
+                    date: '5-7 Settembre 2025'
+                },
+                'misano': {
+                    image: '../../immagini/piste/misano.jpg',
+                    date: '12-14 Settembre 2025'
+                },
+                'motegi': {
+                    image: '../../immagini/piste/motegi.jpg',
+                    date: '26-28 Settembre 2025'
+                },
+                'mandalika': {
+                    image: '../../immagini/piste/mandalika.jpg',
+                    date: '3-5 Ottobre 2025'
+                },
+                'phillipisland': {
+                    image: '../../immagini/piste/phillipisland.jpg',
+                    date: '17-19 Ottobre 2025'
+                },
+                'sepang': {
+                    image: '../../immagini/piste/sepang.jpg',
+                    date: '24-26 Ottobre 2025'
+                },
+                'portimao': {
+                    image: '../../immagini/piste/portimao.jpg', 
+                    date: '7-9 Novembre 2025'
+                },
+                'valencia': {
+                    image: '../../immagini/piste/valencia.jpg',
+                    date: '14-16 Novembre 2025'
+                }
+            };
+        } else {
+            // Dati per il 2026
+            return {
+                // Aggiungi i dati delle piste per il 2026 qui
+            };
+        }   
+    }
+    // Mappa delle piste con immagini e date
+    const trackData = getTrackDatas(getAnno());
 
     setTimeout(() => {
         scrollToCalendario();
@@ -160,7 +283,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     async function caricaGara(nomeGara) {
-        const textFile = `../docs/${nomeGara}.txt`;
+        const basePath = getBasePath();
+        const textFile = `${basePath}/${nomeGara}.txt`;
         
         if (!container) {
             console.error("Elemento 'contenuto-testo' non trovato!");
@@ -272,9 +396,16 @@ document.addEventListener("DOMContentLoaded", () => {
     function scrollToTrack() {
         const trackInfo = document.querySelector('.track-info');
         if (trackInfo) {
-            trackInfo.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'start'
+            // Calcola la posizione del trackInfo
+            const trackInfoRect = trackInfo.getBoundingClientRect();
+            const trackInfoTop = trackInfoRect.top + window.pageYOffset;
+            
+            // Calcola dove dovrebbe essere il tasto risultati (circa 300px sotto il trackInfo)
+            const targetPosition = trackInfoTop + 300;
+            
+            window.scrollTo({
+                top: targetPosition,
+                behavior: 'smooth'
             });
         }
     }

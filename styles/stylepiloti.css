@@ -38,6 +38,83 @@
     display: block;
 }
 
+/* Stili per i dropdown */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #000; /* Sfondo nero */
+    min-width: 140px;
+    box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.2);
+    z-index: 1001;
+    border-radius: 4px;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 0;
+    border: 1px solid #333; /* Bordo grigio scuro */
+}
+
+.dropdown-content a {
+    color: white; /* Testo bianco */
+    padding: 6px 10px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s;
+    border-bottom: 1px solid #333; /* Separatori grigio scuro */
+    font-size: 13px;
+    white-space: nowrap;
+    line-height: 1.2;
+    text-align: center;
+}
+
+.dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+.dropdown-content a:hover {
+    background-color: #ff5e00; /* Arancione al hover */
+    color: white;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropbtn {
+    font-size: 18px;
+    border: none;
+    outline: none;
+    color: white;
+    padding: 14px 16px;
+    background-color: inherit;
+    font-family: inherit;
+    margin: 0;
+    cursor: pointer;
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+.dropbtn:hover {
+    color: #ff5e00;
+}
+
+/* Modifica alla navbar per supportare i dropdown */
+.navbar ul {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+}
+
+.navbar ul > * {
+    margin: 0;
+}
+
 /* Container tabelle */
 .tabelle-container {
     display: flex;
@@ -186,4 +263,63 @@ table, th, td {
     .infobox, .wikitable {
         max-width: 95%;
     }
+}
+
+/* Stile per tabelle attaccate - CORRETTO */
+.tables-container-attached {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    width: 100%;
+    display: block;
+}
+
+.tables-container-attached table {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tables-container-attached table:not(:last-child) {
+    border-bottom: 1px solid #ccc;
+}
+
+/* Assicurati che le tabelle attaccate abbiano bordi coerenti */
+.tables-container-attached .wikitable {
+    border: none;
+}
+
+.tables-container-attached .wikitable tr:last-child td {
+    border-bottom: none;
+}
+
+/* Container pilota che occupa tutta la larghezza */
+.pilota-section {
+    display: block;
+    width: 100%;
+    max-width: none;
+}
+
+/* Assicura che il container storico occupi tutta la larghezza */
+#storico-container {
+    width: 100%;
+    max-width: none;
+    padding: 0 10px;
+}
+
+/* Forza le tabelle a occupare tutta la larghezza disponibile */
+.wikitable {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Rimuovi eventuali margini o padding che causano spazi bianchi */
+.tabelle-container {
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
 }

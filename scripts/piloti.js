@@ -2,30 +2,356 @@
 let M = {Nome:"Manuel Bonelli",Nazione:"Italia",Numero:31,Esordio:"2024",Mondiali:0,Gare:0,Vittorie:0,Podi:0,Punti:0,Pole:0,FL:0};
 let L = {Nome:"Lorenzo Gabrielli",Nazione:"Italia",Numero:16,Esordio:"2024",Mondiali:0,Gare:0,Vittorie:0,Podi:0,Punti:0,Pole:0,FL:0};
 
-const gareInfo = [
-    { nome: "Lusail", img: "https://flagcdn.com/w80/qa.png" },
-    { nome: "Portimão", img: "https://flagcdn.com/w80/pt.png" },
-    { nome: "Americhe", img: "https://flagcdn.com/w80/us-tx.png" },
-    { nome: "Jerez", img: "https://flagcdn.com/w80/es.png" },
-    { nome: "Le Mans", img: "https://flagcdn.com/w80/fr.png" },
-    { nome: "Catalogna 1", img: "https://flagcdn.com/w80/es.png" },
-    { nome: "Mugello", img: "https://flagcdn.com/w80/it.png" },
-    { nome: "Assen", img: "https://flagcdn.com/w80/nl.png" },
-    { nome: "Sachsenring", img: "https://flagcdn.com/w80/de.png" },
-    { nome: "Silverstone", img: "https://flagcdn.com/w80/gb.png" },
-    { nome: "Red Bull Ring", img: "https://flagcdn.com/w80/at.png" },
-    { nome: "Aragón", img: "https://flagcdn.com/w80/es.png" },
-    { nome: "Misano 1", img: "https://flagcdn.com/w80/sm.png" },
-    { nome: "Misano 2", img: "https://flagcdn.com/w80/sm.png" },
-    { nome: "Mandalika", img: "https://flagcdn.com/w80/id.png" },
-    { nome: "Motegi", img: "https://flagcdn.com/w80/jp.png" },
-    { nome: "Phillip Island", img: "https://flagcdn.com/w80/au.png" },
-    { nome: "Buriram", img: "https://flagcdn.com/w80/th.png" },
-    { nome: "Sepang", img: "https://flagcdn.com/w80/my.png" },
-    { nome: "Catalogna 2", img: "https://flagcdn.com/w80/es.png" },
+// Array dei file Excel da processare
+const excelFiles = [
+    '../docs/classifiche/classifica2024.xlsx',
+    '../docs/classifiche/classifica2025.xlsx',
+    '../docs/classifiche/classifica2026.xlsx'
 ];
 
-// Estrazione anno e categoria dalla riga principale
+// FUNZIONE PER ESTRARRE DINAMICAMENTE LE GARE DAL FILE EXCEL
+// FUNZIONE PER ESTRARRE DINAMICAMENTE LE GARE DAL FILE EXCEL
+function estraiGareInfo(sheet) {
+    const gareInfo = [];
+    const range = XLSX.utils.decode_range(sheet['!ref']);
+    
+    let rigaGare = -1;
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        const cellPilota = sheet[XLSX.utils.encode_cell({r: R, c: 0})];
+        if (cellPilota && cellPilota.v && cellPilota.v.toString().toLowerCase().includes('pilota')) {
+            rigaGare = R;
+            break;
+        }
+    }
+    
+    if (rigaGare === -1) {
+        console.log("Intestazione 'PILOTA' non trovata");
+        return [];
+    }
+    
+    const mappaCircuiti = {
+        'qatar': { nome: "Lusail", img: "https://flagcdn.com/w80/qa.png" },
+        'lusail': { nome: "Lusail", img: "https://flagcdn.com/w80/qa.png" },
+        'portogallo': { nome: "Portimão", img: "https://flagcdn.com/w80/pt.png" },
+        'portimao': { nome: "Portimão", img: "https://flagcdn.com/w80/pt.png" },
+        'americhe': { nome: "Americhe", img: "https://flagcdn.com/w80/us-tx.png" },
+        'spagna': { nome: "Jerez", img: "https://flagcdn.com/w80/es.png" },
+        'jerez': { nome: "Jerez", img: "https://flagcdn.com/w80/es.png" },
+        'francia': { nome: "Le Mans", img: "https://flagcdn.com/w80/fr.png" },
+        'lemans': { nome: "Le Mans", img: "https://flagcdn.com/w80/fr.png" },
+        'catalogna': { nome: "Catalogna", img: "https://flagcdn.com/w80/es.png" },
+        'italia': { nome: "Mugello", img: "https://flagcdn.com/w80/it.png" },
+        'mugello': { nome: "Mugello", img: "https://flagcdn.com/w80/it.png" },
+        'olanda': { nome: "Assen", img: "https://flagcdn.com/w80/nl.png" },
+        'assen': { nome: "Assen", img: "https://flagcdn.com/w80/nl.png" },
+        'germania': { nome: "Sachsenring", img: "https://flagcdn.com/w80/de.png" },
+        'sachsenring': { nome: "Sachsenring", img: "https://flagcdn.com/w80/de.png" },
+        'gran bretagna': { nome: "Silverstone", img: "https://flagcdn.com/w80/gb.png" },
+        'silverstone': { nome: "Silverstone", img: "https://flagcdn.com/w80/gb.png" },
+        'austria': { nome: "Red Bull Ring", img: "https://flagcdn.com/w80/at.png" },
+        'redbullring': { nome: "Red Bull Ring", img: "https://flagcdn.com/w80/at.png" },
+        'aragon': { nome: "Aragón", img: "https://flagcdn.com/w80/es.png" },
+        'misano': { nome: "Misano", img: "https://flagcdn.com/w80/sm.png" },
+        'indonesia': { nome: "Mandalika", img: "https://flagcdn.com/w80/id.png" },
+        'mandalika': { nome: "Mandalika", img: "https://flagcdn.com/w80/id.png" },
+        'giappone': { nome: "Motegi", img: "https://flagcdn.com/w80/jp.png" },
+        'motegi': { nome: "Motegi", img: "https://flagcdn.com/w80/jp.png" },
+        'australia': { nome: "Phillip Island", img: "https://flagcdn.com/w80/au.png" },
+        'phillipisland': { nome: "Phillip Island", img: "https://flagcdn.com/w80/au.png" },
+        'thailandia': { nome: "Buriram", img: "https://flagcdn.com/w80/th.png" },
+        'buriram': { nome: "Buriram", img: "https://flagcdn.com/w80/th.png" },
+        'sepang': { nome: "Sepang", img: "https://flagcdn.com/w80/my.png" },
+        'valencia': { nome: "Valencia", img: "https://flagcdn.com/w80/es.png" },
+        'termas': { nome: "Termas de Río Hondo", img: "https://flagcdn.com/w80/ar.png" },
+        'brno': { nome: "Brno", img: "https://flagcdn.com/w80/cz.png" },
+        'buddh': { nome: "Buddh", img: "https://flagcdn.com/w80/in.png" }
+    };
+    
+    const contatoriPiste = {};
+    
+    // MODIFICA: Controlliamo quando fermarci nell'estrazione delle colonne
+    // Iniziamo dalla colonna 3 (D) e ci fermiamo quando troviamo una cella vuota o arriviamo alla fine
+    for (let C = 3; C <= range.e.c; ++C) {
+        const cell = sheet[XLSX.utils.encode_cell({r: rigaGare, c: C})];
+        
+        // Se la cella è vuota o non esiste, interrompiamo l'estrazione
+        if (!cell || !cell.v || cell.v.toString().trim() === '') {
+            console.log(`Interrotto estrazione gare alla colonna ${C} - cella vuota`);
+            break;
+        }
+        
+        const nomeGaraOriginale = cell.v.toString().trim();
+        const nomeGara = nomeGaraOriginale.toLowerCase();
+        
+        // Se il nome della gara è "TEAM" o simile, interrompiamo
+        if (nomeGara.includes('team') || nomeGara.includes('costruttori') || nomeGara.includes('classifica')) {
+            console.log(`Interrotto estrazione gare alla colonna ${C} - trovata sezione team`);
+            break;
+        }
+        
+        let circuitoTrovato = null;
+        let chiaveTrovata = null;
+        
+        for (const [key, circuito] of Object.entries(mappaCircuiti)) {
+            if (nomeGara.includes(key)) {
+                circuitoTrovato = { ...circuito };
+                chiaveTrovata = key;
+                break;
+            }
+        }
+        
+        if (circuitoTrovato) {
+            if (!contatoriPiste[chiaveTrovata]) {
+                contatoriPiste[chiaveTrovata] = 1;
+            } else {
+                contatoriPiste[chiaveTrovata]++;
+            }
+            
+            if (contatoriPiste[chiaveTrovata] > 1) {
+                circuitoTrovato.nome = `${circuitoTrovato.nome} ${contatoriPiste[chiaveTrovata]}`;
+            }
+            
+            gareInfo.push(circuitoTrovato);
+        } else {
+            gareInfo.push({
+                nome: nomeGaraOriginale,
+                img: "https://flagcdn.com/w80/_unitednations.png"
+            });
+        }
+    }
+    
+    console.log("Gare estratte dinamicamente:", gareInfo.length, "gare:", gareInfo);
+    return gareInfo;
+}
+
+// MODIFICA: Funzione per processare un singolo file Excel
+async function processExcelFile(filePath) {
+    try {
+        console.log(`📊 Tentativo di caricare: ${filePath}`);
+        
+        const response = await fetch(filePath);
+        if (!response.ok) {
+            console.log(`❌ File non trovato: ${filePath}`);
+            return null;
+        }
+        
+        console.log(`✅ File trovato: ${filePath}`);
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+
+        const { anno, categoria } = estraiAnnoCategoria(sheet);
+        console.log(`Anno e categoria da ${filePath}:`, anno, categoria);
+
+        const gareInfo = estraiGareInfo(sheet);
+
+        if (gareInfo.length === 0) {
+            console.log(`❌ Nessuna gara trovata nel file ${filePath}`);
+            return null;
+        }
+
+        const classificaPiloti = estraiClassificaPilotiCompleta(sheet);
+        
+        if (classificaPiloti && classificaPiloti.length > 0) {
+            try {
+                const classificaFinale = calcolaClassificaFinale(classificaPiloti, sheet);
+                console.log(`🏆 CLASSIFICA FINALE ${anno}:`, classificaFinale.map((p, i) => `${i+1}°: ${p.Pilota} - ${p.Punti} punti`));
+            } catch (error) {
+                console.log(`Classifica finale ${anno} non calcolabile, ma continuo con i dati base`);
+            }
+        } else {
+            console.log(`Nessun dato di classifica disponibile per ${anno}`);
+        }
+
+        const storicoBonelli = await estraiStoricoPilota(sheet, "Manuel Bonelli");
+        const storicoGabrielli = await estraiStoricoPilota(sheet, "Lorenzo Gabrielli");
+
+        if (storicoBonelli) aggiornaStatistiche(sheet, storicoBonelli, classificaPiloti, anno);
+        if (storicoGabrielli) aggiornaStatistiche(sheet, storicoGabrielli, classificaPiloti, anno);
+
+        return {
+            anno,
+            categoria,
+            gareInfo,
+            classificaPiloti,
+            storicoBonelli,
+            storicoGabrielli,
+            sheet
+        };
+
+    } catch (error) {
+        console.error(`Errore nel processare ${filePath}:`, error);
+        return null;
+    }
+}
+
+// MODIFICA: Main function che itera su tutti i file nell'array
+async function main() {
+    try {
+        console.log('File Excel da processare:', excelFiles);
+        
+        const risultati = [];
+        
+        for (const filePath of excelFiles) {
+            const risultato = await processExcelFile(filePath);
+            if (risultato) {
+                risultati.push(risultato);
+            }
+        }
+        
+        console.log('Processamento completato per', risultati.length, 'file su', excelFiles.length);
+        
+        mostraRisultatiNelDOM(risultati);
+        
+        const container = document.querySelector('.tabelle-container');
+        if (container) {
+            const containerTop = container.getBoundingClientRect().top + window.scrollY;
+            const containerHeight = container.offsetHeight;
+            const offset = 150;
+            const scrollPosition = containerTop + containerHeight / 2 - window.innerHeight / 2 + offset;
+
+            window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
+        }
+
+    } catch (err) {
+        console.error("Errore nel main:", err);
+    }
+}
+
+// MODIFICA: Mostra i risultati nel DOM con stile Wikipedia e tabelle attaccate
+function mostraRisultatiNelDOM(risultati) {
+    const infoboxContainer = document.getElementById('infobox-container');
+    const storicoContainer = document.getElementById('storico-container');
+    
+    if (!infoboxContainer || !storicoContainer) {
+        console.error("Contenitori non trovati nel DOM");
+        return;
+    }
+    
+    infoboxContainer.innerHTML = '';
+    storicoContainer.innerHTML = '';
+    
+    // Mostra le statistiche cumulative dei piloti
+    infoboxContainer.appendChild(createTabellaPilota(M));
+    infoboxContainer.appendChild(createTabellaPilota(L));
+    
+    // Raggruppa le tabelle per pilota
+    const storicoBonelli = [];
+    const storicoGabrielli = [];
+    
+    risultati.forEach(risultato => {
+        const { anno, categoria, gareInfo, storicoBonelli: sb, storicoGabrielli: sg, classificaPiloti, sheet } = risultato;
+        
+        if (sb) {
+            storicoBonelli.push({
+                anno, categoria, gareInfo, storicoPilota: sb, classificaPiloti, sheet
+            });
+        }
+        if (sg) {
+            storicoGabrielli.push({
+                anno, categoria, gareInfo, storicoPilota: sg, classificaPiloti, sheet
+            });
+        }
+    });
+    
+    // Crea container per Manuel Bonelli con tutte le tabelle attaccate
+    if (storicoBonelli.length > 0) {
+        // Container principale per tutto il blocco Bonelli
+        const bonelliSection = document.createElement('div');
+        bonelliSection.className = 'pilota-section';
+        bonelliSection.style.marginBottom = '40px';
+        bonelliSection.style.width = '100%'; // Occupa tutta la larghezza
+        
+        // Titolo principale sopra le tabelle
+        const bonelliTitle = document.createElement('h2');
+        bonelliTitle.textContent = 'Manuel Bonelli';
+        bonelliTitle.style.marginTop = '40px';
+        bonelliTitle.style.marginBottom = '20px';
+        bonelliTitle.style.color = '#2c3e50';
+        bonelliTitle.style.borderBottom = '2px solid #2c3e50';
+        bonelliTitle.style.paddingBottom = '10px';
+        bonelliTitle.style.fontSize = '24px';
+        bonelliTitle.style.textAlign = 'center';
+        bonelliTitle.style.width = '100%'; // Occupa tutta la larghezza
+        bonelliSection.appendChild(bonelliTitle);
+        
+        // Container per le tabelle attaccate
+        const bonelliTablesContainer = document.createElement('div');
+        bonelliTablesContainer.className = 'tables-container-attached';
+        bonelliTablesContainer.style.width = '100%'; // Occupa tutta la larghezza
+        
+        storicoBonelli.forEach(dati => {
+            const tabella = createTabellaStorico(
+                dati.storicoPilota, 
+                dati.anno, 
+                dati.categoria, 
+                dati.classificaPiloti, 
+                dati.sheet, 
+                dati.gareInfo
+            );
+            // Rimuovi il margine inferiore per attaccare le tabelle
+            tabella.style.marginBottom = '0';
+            tabella.style.borderBottom = 'none';
+            tabella.style.width = '100%'; // Occupa tutta la larghezza
+            bonelliTablesContainer.appendChild(tabella);
+        });
+        
+        bonelliSection.appendChild(bonelliTablesContainer);
+        storicoContainer.appendChild(bonelliSection);
+    }
+    
+    // Crea container per Lorenzo Gabrielli con tutte le tabelle attaccate
+    if (storicoGabrielli.length > 0) {
+        // Container principale per tutto il blocco Gabrielli
+        const gabrielliSection = document.createElement('div');
+        gabrielliSection.className = 'pilota-section';
+        gabrielliSection.style.marginBottom = '40px';
+        gabrielliSection.style.width = '100%'; // Occupa tutta la larghezza
+        
+        // Titolo principale sopra le tabelle
+        const gabrielliTitle = document.createElement('h2');
+        gabrielliTitle.textContent = 'Lorenzo Gabrielli';
+        gabrielliTitle.style.marginTop = '40px';
+        gabrielliTitle.style.marginBottom = '20px';
+        gabrielliTitle.style.color = '#2c3e50';
+        gabrielliTitle.style.borderBottom = '2px solid #2c3e50';
+        gabrielliTitle.style.paddingBottom = '10px';
+        gabrielliTitle.style.fontSize = '24px';
+        gabrielliTitle.style.textAlign = 'center';
+        gabrielliTitle.style.width = '100%'; // Occupa tutta la larghezza
+        gabrielliSection.appendChild(gabrielliTitle);
+        
+        // Container per le tabelle attaccate
+        const gabrielliTablesContainer = document.createElement('div');
+        gabrielliTablesContainer.className = 'tables-container-attached';
+        gabrielliTablesContainer.style.width = '100%'; // Occupa tutta la larghezza
+        
+        storicoGabrielli.forEach(dati => {
+            const tabella = createTabellaStorico(
+                dati.storicoPilota, 
+                dati.anno, 
+                dati.categoria, 
+                dati.classificaPiloti, 
+                dati.sheet, 
+                dati.gareInfo
+            );
+            // Rimuovi il margine inferiore per attaccare le tabelle
+            tabella.style.marginBottom = '0';
+            tabella.style.borderBottom = 'none';
+            tabella.style.width = '100%'; // Occupa tutta la larghezza
+            gabrielliTablesContainer.appendChild(tabella);
+        });
+        
+        gabrielliSection.appendChild(gabrielliTablesContainer);
+        storicoContainer.appendChild(gabrielliSection);
+    }
+    
+    if (risultati.length === 0) {
+        storicoContainer.innerHTML = '<p style="text-align: center; color: #666;">Nessun dato disponibile</p>';
+    }
+}
+
+// Le altre funzioni rimangono UGUALI
 function estraiAnnoCategoria(sheet) {
     const cellA1 = sheet['A1'];
     if (!cellA1 || !cellA1.v) {
@@ -34,11 +360,9 @@ function estraiAnnoCategoria(sheet) {
     
     const testo = cellA1.v.toString().toUpperCase();
     
-    // Estrazione anno
     const annoMatch = testo.match(/\b(20\d{2})\b/);
     const anno = annoMatch ? annoMatch[1] : "2024";
     
-    // Estrazione categoria
     const categoriaMatch = testo.match(/MOTO\s*(\d+)/i);
     const categoria = categoriaMatch ? `Moto${categoriaMatch[1]}` : "Moto3";
     
@@ -46,7 +370,6 @@ function estraiAnnoCategoria(sheet) {
     return { anno, categoria };
 }
 
-// Estrazione storico pilota
 async function estraiStoricoPilota(sheet, pilotaNome) {
     const storico = [];
     const range = XLSX.utils.decode_range(sheet['!ref']);
@@ -65,16 +388,33 @@ async function estraiStoricoPilota(sheet, pilotaNome) {
         return null;
     }
 
-    for (let C = range.s.c; C <= range.e.c; ++C) {
+    // MODIFICA: Estraiamo solo fino alla colonna delle gare, non oltre
+    // Colonne: 0=Pilota, 1=Punti, 2=Scuderia, 3+=Gare
+    let maxColonneGare = 0;
+    
+    // Prima troviamo quante colonne di gare ci sono
+    for (let C = 3; C <= range.e.c; ++C) {
+        const cellHeader = sheet[XLSX.utils.encode_cell({c: C, r: startRow})];
+        if (!cellHeader || !cellHeader.v || cellHeader.v.toString().trim() === '') {
+            break;
+        }
+        maxColonneGare = C;
+    }
+    
+    // Se non abbiamo trovato colonne di gare, usiamo un limite ragionevole
+    if (maxColonneGare === 0) {
+        maxColonneGare = Math.min(range.e.c, 25); // Massimo 25 gare
+    }
+
+    for (let C = 0; C <= maxColonneGare; ++C) {
         const cell = sheet[XLSX.utils.encode_cell({c: C, r: startRow})];
         storico.push(cell ? cell.v : null);
     }
     
-    console.log(`Storico per ${pilotaNome}:`, storico);
+    console.log(`Storico per ${pilotaNome}:`, storico.length, "colonne -", storico);
     return storico;
 }
 
-// Conteggio pole e FL
 function getPole(sheet, nomePilota) {
     const range = XLSX.utils.decode_range(sheet['!ref']);
     let startRow = -1;
@@ -98,7 +438,6 @@ function getPole(sheet, nomePilota) {
     return [poles, fl];
 }
 
-// NUOVA FUNZIONE: Verifica se un pilota ha vinto il campionato (CON CONTROLLO SICUREZZA)
 function verificaVincitoreCampionato(nomePilota, classificaPiloti, sheet) {
     if (!classificaPiloti || classificaPiloti.length === 0) {
         console.log("Classifica piloti vuota o non disponibile");
@@ -106,10 +445,8 @@ function verificaVincitoreCampionato(nomePilota, classificaPiloti, sheet) {
     }
     
     try {
-        // Ottieni la classifica finale con spareggi
         const classificaFinale = calcolaClassificaFinale(classificaPiloti, sheet);
         
-        // Controlla se il pilota è primo in classifica
         if (classificaFinale.length > 0) {
             const primoClassificato = classificaFinale[0];
             const isVincitore = primoClassificato.Pilota && 
@@ -128,7 +465,6 @@ function verificaVincitoreCampionato(nomePilota, classificaPiloti, sheet) {
     return false;
 }
 
-// NUOVA FUNZIONE: Calcola classifica finale completa con spareggi (CON CONTROLLI SICUREZZA)
 function calcolaClassificaFinale(classificaPiloti, sheet) {
     if (!classificaPiloti || classificaPiloti.length === 0) {
         console.log("Nessun dato pilota per calcolare la classifica finale");
@@ -136,7 +472,6 @@ function calcolaClassificaFinale(classificaPiloti, sheet) {
     }
     
     try {
-        // Ottieni i risultati completi di ogni pilota per gli spareggi
         const classificaConRisultati = classificaPiloti.map(pilota => {
             if (!pilota || !pilota.Pilota) {
                 console.warn("Pilota non valido nella classifica:", pilota);
@@ -166,57 +501,48 @@ function calcolaClassificaFinale(classificaPiloti, sheet) {
                     quinti: 0
                 };
             }
-        }).filter(pilota => pilota !== null); // Rimuovi eventuali valori null
+        }).filter(pilota => pilota !== null);
 
         if (classificaConRisultati.length === 0) {
             console.log("Nessun pilota valido per la classifica finale");
             return [];
         }
         
-        // Ordina con spareggi completi
         const classificaOrdinata = [...classificaConRisultati].sort((a, b) => {
             try {
                 const puntiA = a.Punti || 0;
                 const puntiB = b.Punti || 0;
                 
-                // 1. Ordina per punti (discendente)
                 if (puntiB !== puntiA) {
                     return puntiB - puntiA;
                 }
                 
-                // 2. SPAREGGIO: maggior numero di vittorie
                 if (b.vittorie !== a.vittorie) {
                     return b.vittorie - a.vittorie;
                 }
                 
-                // 3. SPAREGGIO: maggior numero di secondi posti
                 if (b.secondi !== a.secondi) {
                     return b.secondi - a.secondi;
                 }
                 
-                // 4. SPAREGGIO: maggior numero di terzi posti
                 if (b.terzi !== a.terzi) {
                     return b.terzi - a.terzi;
                 }
                 
-                // 5. SPAREGGIO: maggior numero di quarti posti
                 if (b.quarti !== a.quarti) {
                     return b.quarti - a.quarti;
                 }
                 
-                // 6. SPAREGGIO: maggior numero di quinti posti
                 if (b.quinti !== a.quinti) {
                     return b.quinti - a.quinti;
                 }
                 
-                // 7. SPAREGGIO: risultato migliore nell'ultima gara
                 const ultimoRisultatoA = ottieniUltimoRisultatoValido(a.risultati);
                 const ultimoRisultatoB = ottieniUltimoRisultatoValido(b.risultati);
                 if (ultimoRisultatoA !== ultimoRisultatoB) {
-                    return ultimoRisultatoA - ultimoRisultatoB; // Posizione più bassa = meglio
+                    return ultimoRisultatoA - ultimoRisultatoB;
                 }
                 
-                // 8. Se tutto è uguale, ordine alfabetico inverso (Z-A) come ultimo spareggio
                 return (b.Pilota || '').localeCompare(a.Pilota || '');
             } catch (error) {
                 console.error("Errore nell'ordinamento:", error);
@@ -227,11 +553,10 @@ function calcolaClassificaFinale(classificaPiloti, sheet) {
         return classificaOrdinata;
     } catch (error) {
         console.error("Errore critico nel calcolo classifica finale:", error);
-        return classificaPiloti; // Fallback: ritorna classifica originale
+        return classificaPiloti;
     }
 }
 
-// Aggiornamento statistiche pilota (MODIFICATA per includere mondiali con controlli)
 function aggiornaStatistiche(sheet, storicoPilota, classificaPiloti, anno) {
     if (!storicoPilota) return;
     
@@ -247,7 +572,6 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaPiloti, anno) {
     pilota.FL += fl;
     pilota.Moto = moto;
 
-    // Conta gare, vittorie e podi
     for (let g of gare) {
         if (g != null && g !== '' && g !== 'RIT') {
             pilota.Gare++;
@@ -259,7 +583,6 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaPiloti, anno) {
         }
     }
     
-    // VERIFICA SE HA VINTO IL CAMPIONATO (solo se abbiamo dati validi)
     if (classificaPiloti && classificaPiloti.length > 0) {
         try {
             if (verificaVincitoreCampionato(nome, classificaPiloti, sheet)) {
@@ -274,12 +597,10 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaPiloti, anno) {
     }
 }
 
-// Estrazione classifica piloti completa - VERSIONE CORRETTA
 function estraiClassificaPilotiCompleta(sheet) {
     const risultati = [];
     const range = XLSX.utils.decode_range(sheet['!ref']);
 
-    // Trova la riga d'inizio (dopo "PILOTA")
     let startRow = -1;
     for (let R = range.s.r; R <= range.e.r; ++R) {
         const cell = sheet[XLSX.utils.encode_cell({ r: R, c: 0 })];
@@ -294,19 +615,16 @@ function estraiClassificaPilotiCompleta(sheet) {
         return risultati;
     }
 
-    // Legge i dati dei piloti
     for (let R = startRow; R <= range.e.r; ++R) {
         const cellPilota = sheet[XLSX.utils.encode_cell({ r: R, c: 0 })];
         const cellPunti = sheet[XLSX.utils.encode_cell({ r: R, c: 1 })];
         const cellScuderia = sheet[XLSX.utils.encode_cell({ r: R, c: 2 })];
 
-        // Stop se arriviamo alla sezione TEAM
         if (cellPilota && cellPilota.v && cellPilota.v.toString().toLowerCase().includes('team')) {
             console.log("Trovata sezione TEAM, interrompo estrazione piloti");
             break;
         }
 
-        // Salta righe vuote o non valide
         if (!cellPilota || !cellPilota.v) continue;
 
         const pilota = cellPilota.v.toString().trim();
@@ -320,14 +638,10 @@ function estraiClassificaPilotiCompleta(sheet) {
 
         const scuderia = cellScuderia ? cellScuderia.v.toString().trim() : '';
 
-        // --- CALCOLO PUNTI (stessa logica della versione funzionante) ---
         let punti = 0;
-
         if (cellPunti) {
             if (cellPunti.v !== undefined && cellPunti.v !== null) {
-                // Se Excel ha già salvato il valore calcolato, usiamolo
                 const val = cellPunti.v;
-
                 if (typeof val === 'number') {
                     punti = val;
                 } else if (typeof val === 'string') {
@@ -338,14 +652,11 @@ function estraiClassificaPilotiCompleta(sheet) {
                     }
                 }
             } else if (cellPunti.f) {
-                // Se c'è solo una formula, usa la funzione calcolaPuntiDaFormula migliorata
                 punti = calcolaPuntiDaFormulaCompleta(cellPunti.f, sheet);
             }
         }
 
-        // Se abbiamo trovato un pilota valido, aggiungilo
         if (pilota && punti >= 0) {
-            // Arrotonda solo se serve a mostrare mezzi punti (es. 67.5)
             const puntiArrotondati = Math.round(punti * 10) / 10;
             risultati.push({
                 Pilota: pilota,
@@ -359,12 +670,9 @@ function estraiClassificaPilotiCompleta(sheet) {
     return risultati;
 }
 
-// Versione migliorata di calcolaPuntiDaFormula per la classifica completa
 function calcolaPuntiDaFormulaCompleta(formula, sheet) {
-    // Estrai i riferimenti delle celle dalla formula
     const matches = formula.match(/[A-Z]+\d+/g);
     if (!matches) {
-        // Se non ci sono riferimenti a celle, prova a estrarre numeri direttamente
         const numberMatches = formula.match(/\d+\.?\d*/g);
         return numberMatches ? numberMatches.reduce((sum, num) => sum + parseFloat(num), 0) : 0;
     }
@@ -375,18 +683,13 @@ function calcolaPuntiDaFormulaCompleta(formula, sheet) {
         const cell = sheet[ref];
         if (cell) {
             if (cell.v !== undefined && cell.v !== null) {
-                // Se è un numero
                 if (typeof cell.v === 'number') {
                     totale += cell.v;
-                } 
-                // Se è una stringa, controlla se è un numero o "RIT"
-                else if (typeof cell.v === 'string') {
+                } else if (typeof cell.v === 'string') {
                     const trimmed = cell.v.trim().toUpperCase();
                     if (trimmed === 'RIT' || trimmed === '' || trimmed === 'DNS' || trimmed === 'DNF') {
-                        // Ritirato = 0 punti
                         totale += 0;
                     } else {
-                        // Prova a convertire in numero
                         const num = parseFloat(trimmed);
                         if (!isNaN(num)) {
                             totale += num;
@@ -397,11 +700,9 @@ function calcolaPuntiDaFormulaCompleta(formula, sheet) {
         }
     });
     
-    // Aggiungi eventuali numeri direttamente nella formula (mezzi punti)
     const directNumbers = formula.match(/\b\d+\.?\d*\b/g);
     if (directNumbers) {
         directNumbers.forEach(numStr => {
-            // Evita di contare due volte i numeri già presi dalle celle
             if (!formula.includes('Z' + numStr)) {
                 const num = parseFloat(numStr);
                 if (!isNaN(num)) {
@@ -414,7 +715,6 @@ function calcolaPuntiDaFormulaCompleta(formula, sheet) {
     return totale;
 }
 
-// Calcolo posizione in classifica con spareggi completi (CON CONTROLLI)
 function calcolaPosizioneInClassifica(nomePilota, classificaPiloti, sheet) {
     if (!classificaPiloti || classificaPiloti.length === 0) {
         console.log("Classifica non disponibile per calcolare la posizione");
@@ -424,7 +724,6 @@ function calcolaPosizioneInClassifica(nomePilota, classificaPiloti, sheet) {
     try {
         const classificaFinale = calcolaClassificaFinale(classificaPiloti, sheet);
         
-        // Cerca il pilota
         const nomeCercato = nomePilota.trim().toLowerCase();
         const posizione = classificaFinale.findIndex(pilota => {
             if (!pilota || !pilota.Pilota) return false;
@@ -438,12 +737,10 @@ function calcolaPosizioneInClassifica(nomePilota, classificaPiloti, sheet) {
     }
 }
 
-// Funzioni helper per gli spareggi (CON CONTROLLI)
 function ottieniRisultatiPilota(nomePilota, sheet) {
     const range = XLSX.utils.decode_range(sheet['!ref']);
     const risultati = [];
     
-    // Trova la riga del pilota
     let rigaPilota = -1;
     for (let R = range.s.r; R <= range.e.r; ++R) {
         const cell = sheet[XLSX.utils.encode_cell({r: R, c: 0})];
@@ -458,7 +755,6 @@ function ottieniRisultatiPilota(nomePilota, sheet) {
         return risultati;
     }
     
-    // Estrai i risultati dalle colonne delle gare (da colonna 3 in poi)
     for (let C = 3; C <= range.e.c; ++C) {
         const cell = sheet[XLSX.utils.encode_cell({r: rigaPilota, c: C})];
         if (cell && cell.v !== undefined && cell.v !== null) {
@@ -467,18 +763,18 @@ function ottieniRisultatiPilota(nomePilota, sheet) {
             } else if (typeof cell.v === 'string') {
                 const trimmed = cell.v.trim().toUpperCase();
                 if (trimmed === 'RIT' || trimmed === 'DNS' || trimmed === 'DNF') {
-                    risultati.push(999); // Ritirato = valore alto per l'ordinamento
+                    risultati.push(999);
                 } else {
                     const num = parseInt(trimmed);
                     if (!isNaN(num)) {
                         risultati.push(num);
                     } else {
-                        risultati.push(999); // Valore non numerico = ritirato
+                        risultati.push(999);
                     }
                 }
             }
         } else {
-            risultati.push(999); // Cella vuota = ritirato
+            risultati.push(999);
         }
     }
     
@@ -493,12 +789,10 @@ function contaPosizioni(risultati, posizione) {
 function ottieniUltimoRisultatoValido(risultati) {
     if (!risultati || !Array.isArray(risultati)) return 999;
     
-    // Filtra solo i risultati validi (non ritiri) e prendi l'ultimo
     const risultatiValidi = risultati.filter(pos => pos < 999);
     return risultatiValidi.length > 0 ? risultatiValidi[risultatiValidi.length - 1] : 999;
 }
 
-// Creazione infobox
 function createTabellaPilota(pilota) {
     const container = document.createElement('div');
     container.className = "infobox";
@@ -519,8 +813,8 @@ function createTabellaPilota(pilota) {
     return container;
 }
 
-// Creazione tabella storico gare con posizione in campionato
-function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, sheet) {
+// MODIFICA: Aggiorna la funzione createTabellaStorico per rimuovere il nome dalla tabella
+function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, sheet, gareInfo) {
     if (!storicoPilota) {
         const errorDiv = document.createElement('div');
         errorDiv.textContent = "Dati pilota non disponibili";
@@ -536,25 +830,30 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
 
     const table = document.createElement('table');
     table.className = "wikitable";
+    table.style.marginBottom = '0'; // Nessun margine per tabelle attaccate
+    table.style.borderBottom = '1px solid #ccc'; // Solo bordo inferiore
+    table.style.width = '100%'; // Occupa tutta la larghezza disponibile
+    table.style.tableLayout = 'fixed'; // Layout fisso per distribuzione uniforme
 
     const header = document.createElement('tr');
     header.innerHTML = `
-        <th>Nome</th>
-        <th>Anno</th>
-        <th>Categoria</th>
-        <th>Moto</th>
+        <th style="width: 80px;">Anno</th>
+        <th style="width: 100px;">Categoria</th>
+        <th style="width: 120px;">Moto</th>
     `;
     
+    // Calcola la larghezza per le colonne delle gare
+    const larghezzaGara = Math.max(60, Math.floor((100 - 30) / gareInfo.length)); // 30% per le prime 3 colonne
+    
     for (let g of gareInfo) {
-        header.innerHTML += `<th><img src="${g.img}" width="40" height="20" alt="${g.nome}" title="${g.nome}"></th>`;
+        header.innerHTML += `<th style="width: ${larghezzaGara}px;"><img src="${g.img}" width="40" height="20" alt="${g.nome}" title="${g.nome}"></th>`;
     }
     
-    header.innerHTML += `<th>Punti Totali</th><th>Posizione Campionato</th>`;
+    header.innerHTML += `<th style="width: 80px;">Punti</th><th style="width: 60px;">Pos.</th>`;
     table.appendChild(header);
 
     const row = document.createElement('tr');
     row.innerHTML = `
-        <td>${nome}</td>
         <td>${anno}</td>
         <td>${categoria}</td>
         <td>${moto}</td>
@@ -567,9 +866,9 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
         if (pos === 1) classe = 'posizione-1';
         else if (pos === 2) classe = 'posizione-2';
         else if (pos === 3) classe = 'posizione-3';
-        else if (pos >= 4 && pos <= 15) classe = 'posizione-punti'; // Verde chiaro Wikipedia
-        else if (pos === 'RIT' || pos === 'rit') classe = 'ritirato'; // Rosso chiaro Wikipedia
-        else if (pos === '-' || pos === null || pos === '') classe = 'non-classificato'; // Grigio Wikipedia
+        else if (pos >= 4 && pos <= 15) classe = 'posizione-punti';
+        else if (pos === 'RIT' || pos === 'rit') classe = 'ritirato';
+        else if (pos === '-' || pos === null || pos === '') classe = 'non-classificato';
         
         row.innerHTML += `<td class="${classe}">${pos !== '-' ? pos : '-'}</td>`;
     }
@@ -578,69 +877,6 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
     table.appendChild(row);
 
     return table;
-}
-
-// Main function (MODIFICATA con migliori controlli)
-async function main() {
-    try {
-        const response = await fetch('../docs/classifica.xlsx');
-        const arrayBuffer = await response.arrayBuffer();
-        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-        const sheet = workbook.Sheets[workbook.SheetNames[0]];
-
-        const { anno, categoria } = estraiAnnoCategoria(sheet);
-        console.log("Anno e categoria:", anno, categoria);
-
-        const classificaPiloti = estraiClassificaPilotiCompleta(sheet);
-        
-        // MOSTRA LA CLASSIFICA FINALE IN CONSOLE (solo se disponibile)
-        if (classificaPiloti && classificaPiloti.length > 0) {
-            try {
-                const classificaFinale = calcolaClassificaFinale(classificaPiloti, sheet);
-                console.log("🏆 CLASSIFICA FINALE:", classificaFinale.map((p, i) => `${i+1}°: ${p.Pilota} - ${p.Punti} punti`));
-            } catch (error) {
-                console.log("Classifica finale non calcolabile, ma continuo con i dati base");
-            }
-        } else {
-            console.log("Nessun dato di classifica disponibile per questa stagione");
-        }
-
-        const storicoBonelli = await estraiStoricoPilota(sheet, "Manuel Bonelli");
-        const storicoGabrielli = await estraiStoricoPilota(sheet, "Lorenzo Gabrielli");
-
-        // MODIFICATO: Passa classificaPiloti e anno per verificare i mondiali
-        if (storicoBonelli) aggiornaStatistiche(sheet, storicoBonelli, classificaPiloti, anno);
-        if (storicoGabrielli) aggiornaStatistiche(sheet, storicoGabrielli, classificaPiloti, anno);
-
-        const infoboxContainer = document.getElementById('infobox-container');
-        if (infoboxContainer) {
-            infoboxContainer.appendChild(createTabellaPilota(M));
-            infoboxContainer.appendChild(createTabellaPilota(L));
-        }
-
-        const storicoContainer = document.getElementById('storico-container');
-        if (storicoContainer) {
-            if (storicoBonelli) {
-                storicoContainer.appendChild(createTabellaStorico(storicoBonelli, anno, categoria, classificaPiloti, sheet));
-            }
-            if (storicoGabrielli) {
-                storicoContainer.appendChild(createTabellaStorico(storicoGabrielli, anno, categoria, classificaPiloti, sheet));
-            }
-        }
-
-        const container = document.querySelector('.tabelle-container');
-        if (container) {
-            const containerTop = container.getBoundingClientRect().top + window.scrollY;
-            const containerHeight = container.offsetHeight;
-            const offset = 150;
-            const scrollPosition = containerTop + containerHeight / 2 - window.innerHeight / 2 + offset;
-
-            window.scrollTo({ top: scrollPosition, behavior: 'smooth' });
-        }
-
-    } catch (err) {
-        console.error("Errore nel main:", err);
-    }
 }
 
 // Avvio

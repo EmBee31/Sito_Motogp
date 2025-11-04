@@ -7,6 +7,15 @@ document.addEventListener('DOMContentLoaded', function() {
     mostraClassifica('piloti');
 });
 
+function getNomeFileClassifica() {
+    const nomePagina = window.location.pathname.split('/').pop();
+    const nomeBase = nomePagina.replace('.html', '');
+    const percorso = `../../docs/classifiche/${nomeBase}.xlsx`;
+    
+    console.log('Tentativo di caricare file:', percorso);
+    return percorso;
+}
+
 async function mostraClassifica(tipo) {
     const container = document.getElementById('tabella-classifica');
     
@@ -14,7 +23,7 @@ async function mostraClassifica(tipo) {
     container.style.transition = 'opacity 0.2s ease';
     
     setTimeout(async () => {
-        const response = await fetch('../docs/classifica.xlsx');
+        const response = await fetch(getNomeFileClassifica());
         const arrayBuffer = await response.arrayBuffer();
         const workbook = XLSX.read(arrayBuffer, { type: 'array' });
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
