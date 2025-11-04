@@ -3,19 +3,18 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-  }
+}
 
 .navbar {
     width: 100%;
-    background-color: rgba(0,0,0,0.7); /* semi-trasparente */
-    display: flex;        /* disposizione orizzontale */
-    justify-content: center; /* centra i link */
-    gap: 50px;            /* distanza tra i link */
+    background-color: rgba(0,0,0,0.7);
+    display: flex;
+    justify-content: center;
+    gap: 50px;
     padding: 15px 0;
-    position: absolute;   /* sopra il banner */
+    position: absolute;
     top: 0;
     z-index: 1000;
-    
 }
 
 .navbar a {
@@ -24,8 +23,8 @@
     font-weight: bold;
     font-size: 18px;
     transition: color 0.3s;
-    margin: 0 50px; /* distanza fissa tra i link */
-  }
+    margin: 0 50px;
+}
 
 .navbar a:hover {
     color: #ff5e00;
@@ -38,7 +37,7 @@
     display: block;
 }
 
-/* Stili per i dropdown */
+/* Dropdown styles */
 .dropdown {
     position: relative;
     display: inline-block;
@@ -47,7 +46,7 @@
 .dropdown-content {
     display: none;
     position: absolute;
-    background-color: #000; /* Sfondo nero */
+    background-color: #000;
     min-width: 140px;
     box-shadow: 0px 4px 8px 0px rgba(0,0,0,0.2);
     z-index: 1001;
@@ -56,16 +55,16 @@
     left: 50%;
     transform: translateX(-50%);
     padding: 4px 0;
-    border: 1px solid #333; /* Bordo grigio scuro */
+    border: 1px solid #333;
 }
 
 .dropdown-content a {
-    color: white; /* Testo bianco */
+    color: white;
     padding: 6px 10px;
     text-decoration: none;
     display: block;
     transition: background-color 0.3s;
-    border-bottom: 1px solid #333; /* Separatori grigio scuro */
+    border-bottom: 1px solid #333;
     font-size: 13px;
     white-space: nowrap;
     line-height: 1.2;
@@ -77,7 +76,7 @@
 }
 
 .dropdown-content a:hover {
-    background-color: #ff5e00; /* Arancione al hover */
+    background-color: #ff5e00;
     color: white;
 }
 
@@ -103,7 +102,6 @@
     color: #ff5e00;
 }
 
-/* Modifica alla navbar per supportare i dropdown */
 .navbar ul {
     display: flex;
     align-items: center;
@@ -115,13 +113,15 @@
     margin: 0;
 }
 
-/* Container tabelle */
+/* Container principale */
 .tabelle-container {
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
     gap: 30px;
     padding: 30px 10px;
+    width: 100%;
+    max-width: none;
 }
 
 /* Tabelle generiche */
@@ -130,17 +130,15 @@ table {
     margin: 10px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     width: 100%;
-    max-width: 900px;
 }
 
-/* Celle e bordi */
+/* Celle e bordi - BORDI GRIGIO SCURO */
 table, th, td {
-    border: 1px solid #ccc;
-    padding: 12px;
+    border: 1px solid #666666; /* GRIGIO SCURO */
     text-align: center;
 }
 
-/* Infobox pilota (verticale) */
+/* Infobox pilota */
 .infobox {
     width: 280px;
     background-color: #f9f9f9;
@@ -153,49 +151,68 @@ table, th, td {
     background-color: #2c3e50;
     font-size: 16px;
     padding: 12px;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .infobox th:first-child {
-    color: #fff; /* Nome bianco */
-    background-color: #2c3e50; /* Manteniamo lo sfondo blu scuro */
+    color: #fff;
+    background-color: #2c3e50;
     font-size: 18px;
 }
 
 .infobox td {
     font-size: 14px;
     padding: 10px;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
-/* Tabella storico gare (orizzontale) */
+/* Tabella storico gare - BORDI GRIGIO SCURO */
 .wikitable {
     background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
     width: 100%;
-    max-width: 1000px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    table-layout: fixed;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .wikitable th {
-    background-color: #2c3e50;  /* blu più chiaro e leggibile */
+    background-color: #2c3e50;
     color: #fff;
     font-weight: 600;
-    padding: 12px;
+    padding: 8px 4px;
     text-transform: uppercase;
     font-size: 14px;
+    height: 60px;
+    min-height: 60px;
+    max-height: 60px;
+    vertical-align: middle;
+    line-height: 1.2;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .wikitable td {
     font-size: 14px;
-    padding: 10px;
+    padding: 8px 4px;
+    height: 50px;
+    min-height: 50px;
+    max-height: 50px;
+    vertical-align: middle;
+    line-height: 1.2;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
-/* Hover sulle righe */
+.wikitable th img {
+    display: block;
+    margin: 0 auto;
+}
+
+/* Hover e righe alternate */
 .wikitable tr:hover {
     background-color: #f2f2f2;
 }
 
-/* Righe alternate */
 .wikitable tbody tr:nth-child(even) {
     background-color: #fafafa;
 }
@@ -204,47 +221,118 @@ table, th, td {
     background-color: #ffffff;
 }
 
-/* Colori posizioni - Stile Wikipedia */
+/* Colori posizioni - BORDI GRIGIO SCURO */
 .posizione-1 {
-    background-color: #FFD700; /* Oro */
+    background-color: #FFD700;
     color: #000;
     font-weight: bold;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .posizione-2 {
-    background-color: #C0C0C0; /* Argento */
+    background-color: #C0C0C0;
     color: #000;
     font-weight: bold;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .posizione-3 {
-    background-color: #CD7F32; /* Bronzo */
+    background-color: #CD7F32;
     color: #fff;
     font-weight: bold;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
-/* Stile Wikipedia per posizioni a punti */
 .posizione-punti {
-    background-color: #DFD; /* Verde chiaro di Wikipedia */
+    background-color: #DFD;
     color: #000;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
-/* Stile Wikipedia per ritirati */
 .ritirato {
-    background-color: #FDD; /* Rosso chiaro di Wikipedia */
+    background-color: #FDD;
     color: #000;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
-/* Stile Wikipedia per non classificati/assenti */
 .non-classificato {
-    background-color: #EEE; /* Grigio chiaro di Wikipedia */
+    background-color: #EEE;
     color: #666;
     font-style: italic;
+    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
-/* Celle minime uniformi */
-.wikitable th, .wikitable td, .infobox th, .infobox td {
+/* Celle minime */
+.infobox th, .infobox td {
     min-width: 60px;
+}
+
+.wikitable th, .wikitable td {
+    min-width: 60px;
+}
+
+/* Tabelle attaccate - BORDI GRIGIO SCURO */
+.tables-container-attached {
+    border: 1px solid #666666; /* GRIGIO SCURO */
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    width: 100%;
+    display: block;
+}
+
+.tables-container-attached table {
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tables-container-attached table:not(:last-child) {
+    border-bottom: 1px solid #666666; /* GRIGIO SCURO */
+}
+
+.tables-container-attached .wikitable {
+    border: none;
+    border-bottom: 1px solid #666666; /* GRIGIO SCURO */
+}
+
+.tables-container-attached .wikitable:last-child {
+    border-bottom: none;
+}
+
+.tables-container-attached .wikitable tr:last-child td {
+    border-bottom: 1px solid #666666; /* GRIGIO SCURO */
+}
+
+.tables-container-attached .wikitable th,
+.tables-container-attached .wikitable td {
+    height: 50px;
+    min-height: 50px;
+    max-height: 50px;
+    vertical-align: middle;
+    border: 1px solid #666666; /* GRIGIO SCURO */
+}
+
+.tables-container-attached .wikitable th {
+    height: 60px;
+    min-height: 60px;
+    max-height: 60px;
+}
+
+/* Sezioni pilota */
+.pilota-section {
+    display: block;
+    width: 100%;
+    max-width: none;
+    margin-bottom: 40px;
+}
+
+#storico-container {
+    width: 100%;
+    max-width: none;
+    padding: 0 10px;
 }
 
 /* Responsive */
@@ -263,63 +351,15 @@ table, th, td {
     .infobox, .wikitable {
         max-width: 95%;
     }
-}
-
-/* Stile per tabelle attaccate - CORRETTO */
-.tables-container-attached {
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    width: 100%;
-    display: block;
-}
-
-.tables-container-attached table {
-    margin: 0;
-    border-radius: 0;
-    box-shadow: none;
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.tables-container-attached table:not(:last-child) {
-    border-bottom: 1px solid #ccc;
-}
-
-/* Assicurati che le tabelle attaccate abbiano bordi coerenti */
-.tables-container-attached .wikitable {
-    border: none;
-}
-
-.tables-container-attached .wikitable tr:last-child td {
-    border-bottom: none;
-}
-
-/* Container pilota che occupa tutta la larghezza */
-.pilota-section {
-    display: block;
-    width: 100%;
-    max-width: none;
-}
-
-/* Assicura che il container storico occupi tutta la larghezza */
-#storico-container {
-    width: 100%;
-    max-width: none;
-    padding: 0 10px;
-}
-
-/* Forza le tabelle a occupare tutta la larghezza disponibile */
-.wikitable {
-    width: 100% !important;
-    max-width: none !important;
-}
-
-/* Rimuovi eventuali margini o padding che causano spazi bianchi */
-.tabelle-container {
-    width: 100%;
-    max-width: none;
-    padding: 0;
-    margin: 0;
+    
+    .wikitable th,
+    .wikitable td {
+        padding: 6px 3px;
+        font-size: 12px;
+    }
+    
+    .wikitable th img {
+        width: 30px;
+        height: 15px;
+    }
 }

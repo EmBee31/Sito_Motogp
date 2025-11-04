@@ -9,7 +9,26 @@ const excelFiles = [
     '../docs/classifiche/classifica2026.xlsx'
 ];
 
-// FUNZIONE PER ESTRARRE DINAMICAMENTE LE GARE DAL FILE EXCEL
+function formattaNomeTeam(nomeTeam) {
+    if (!nomeTeam || typeof nomeTeam !== 'string') {
+        return nomeTeam || "N/D";
+    }
+    
+    // Converti in minuscolo e dividi le parole
+    const parole = nomeTeam.toLowerCase().split(' ');
+    
+    // Capitalizza ogni parola
+    const paroleCapitalizzate = parole.map(parola => {
+        // Se la parola è vuota, ritorna vuota
+        if (!parola) return '';
+        
+        // Capitalizza la prima lettera e lascia il resto in minuscolo
+        return parola.charAt(0).toUpperCase() + parola.slice(1).toLowerCase();
+    });
+    
+    // Ricostruisci la stringa
+    return paroleCapitalizzate.join(' ').trim();
+}
 // FUNZIONE PER ESTRARRE DINAMICAMENTE LE GARE DAL FILE EXCEL
 function estraiGareInfo(sheet) {
     const gareInfo = [];
@@ -64,7 +83,12 @@ function estraiGareInfo(sheet) {
         'valencia': { nome: "Valencia", img: "https://flagcdn.com/w80/es.png" },
         'termas': { nome: "Termas de Río Hondo", img: "https://flagcdn.com/w80/ar.png" },
         'brno': { nome: "Brno", img: "https://flagcdn.com/w80/cz.png" },
-        'buddh': { nome: "Buddh", img: "https://flagcdn.com/w80/in.png" }
+        'buddh': { nome: "Buddh", img: "https://flagcdn.com/w80/in.png" },
+        'india': { nome: "Buddh", img: "https://flagcdn.com/w80/in.png" },
+        'malesia': { nome: "Sepang", img: "https://flagcdn.com/w80/my.png" },
+        'rp. ceca': { nome: "Brno", img: "https://flagcdn.com/w80/cz.png" },
+        'argentina': { nome: "Termas de Río Hondo", img: "https://flagcdn.com/w80/ar.png" },
+        'usa': { nome: "Americhe", img: "https://flagcdn.com/w80/us-tx.png" }
     };
     
     const contatoriPiste = {};
@@ -636,7 +660,7 @@ function estraiClassificaPilotiCompleta(sheet) {
             continue;
         }
 
-        const scuderia = cellScuderia ? cellScuderia.v.toString().trim() : '';
+        const scuderia = cellScuderia ? formattaNomeTeam(cellScuderia.v.toString().trim()) : '';
 
         let punti = 0;
         if (cellPunti) {
@@ -823,40 +847,40 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
 
     const nome = storicoPilota[0];
     const puntiTot = storicoPilota[1] || 0;
-    const moto = storicoPilota[2] || "N/D";
+    const moto = formattaNomeTeam(storicoPilota[2] || "N/D"); // MODIFICA: formatta il nome della moto
     const gareRisultati = storicoPilota.slice(3);
 
     const posizione = calcolaPosizioneInClassifica(nome, classificaPiloti, sheet);
 
     const table = document.createElement('table');
     table.className = "wikitable";
-    table.style.marginBottom = '0'; // Nessun margine per tabelle attaccate
-    table.style.borderBottom = '1px solid #ccc'; // Solo bordo inferiore
-    table.style.width = '100%'; // Occupa tutta la larghezza disponibile
-    table.style.tableLayout = 'fixed'; // Layout fisso per distribuzione uniforme
+    table.style.marginBottom = '0';
+    table.style.borderBottom = '1px solid #ccc';
+    table.style.width = '100%';
+    table.style.tableLayout = 'fixed';
 
     const header = document.createElement('tr');
     header.innerHTML = `
-        <th style="width: 80px;">Anno</th>
-        <th style="width: 100px;">Categoria</th>
-        <th style="width: 120px;">Moto</th>
+        <th style="width: 80px; height: 60px;">Anno</th>
+        <th style="width: 100px; height: 60px;">Categoria</th>
+        <th style="width: 120px; height: 60px;">Moto</th>
     `;
     
     // Calcola la larghezza per le colonne delle gare
-    const larghezzaGara = Math.max(60, Math.floor((100 - 30) / gareInfo.length)); // 30% per le prime 3 colonne
+    const larghezzaGara = Math.max(50, Math.floor((100 - 300) / gareInfo.length));
     
     for (let g of gareInfo) {
-        header.innerHTML += `<th style="width: ${larghezzaGara}px;"><img src="${g.img}" width="40" height="20" alt="${g.nome}" title="${g.nome}"></th>`;
+        header.innerHTML += `<th style="width: ${larghezzaGara}px; height: 60px;"><img src="${g.img}" width="40" height="20" alt="${g.nome}" title="${g.nome}"></th>`;
     }
     
-    header.innerHTML += `<th style="width: 80px;">Punti</th><th style="width: 60px;">Pos.</th>`;
+    header.innerHTML += `<th style="width: 80px; height: 60px;">Punti</th><th style="width: 60px; height: 60px;">Pos.</th>`;
     table.appendChild(header);
 
     const row = document.createElement('tr');
     row.innerHTML = `
-        <td>${anno}</td>
-        <td>${categoria}</td>
-        <td>${moto}</td>
+        <td style="height: 50px;">${anno}</td>
+        <td style="height: 50px;">${categoria}</td>
+        <td style="height: 50px;">${moto}</td>
     `;
     
     for (let i = 0; i < gareInfo.length; i++) {
@@ -870,15 +894,14 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
         else if (pos === 'RIT' || pos === 'rit') classe = 'ritirato';
         else if (pos === '-' || pos === null || pos === '') classe = 'non-classificato';
         
-        row.innerHTML += `<td class="${classe}">${pos !== '-' ? pos : '-'}</td>`;
+        row.innerHTML += `<td class="${classe}" style="height: 50px;">${pos !== '-' ? pos : '-'}</td>`;
     }
     
-    row.innerHTML += `<td>${puntiTot}</td><td>${posizione}°</td>`;
+    row.innerHTML += `<td style="height: 50px;">${puntiTot}</td><td style="height: 50px;">${posizione}°</td>`;
     table.appendChild(row);
 
     return table;
 }
-
 // Avvio
 document.addEventListener('DOMContentLoaded', function() {
     main().catch(err => console.error(err));
