@@ -88,7 +88,8 @@ function estraiGareInfo(sheet) {
         'malesia': { nome: "Sepang", img: "https://flagcdn.com/w80/my.png" },
         'rp. ceca': { nome: "Brno", img: "https://flagcdn.com/w80/cz.png" },
         'argentina': { nome: "Termas de Río Hondo", img: "https://flagcdn.com/w80/ar.png" },
-        'usa': { nome: "Americhe", img: "https://flagcdn.com/w80/us-tx.png" }
+        'usa': { nome: "Americhe", img: "https://flagcdn.com/w80/us-tx.png" },
+        'kazakhstan': { nome: "Sokol", img: "https://flagcdn.com/w80/kz.png" }
     };
     
     const contatoriPiste = {};
