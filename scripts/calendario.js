@@ -495,7 +495,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const img = document.createElement("img");
         const sourceKey = source.trim().toLowerCase().replace(/[\s\.]+/g, '');
-        img.src = `../immagini/loghi/${sourceKey}.jpg`;
+        img.src = `../../immagini/loghi/${sourceKey}.jpg`;
         img.alt = source;
         img.className = "quote-logo";
         img.onerror = function() { this.style.display = 'none'; };
