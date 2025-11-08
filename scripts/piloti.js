@@ -95,7 +95,7 @@ function estraiGareInfo(sheet) {
     const contatoriPiste = {};
     
     // MODIFICA: Controlliamo quando fermarci nell'estrazione delle colonne
-    // Iniziamo dalla colonna 3 (D) e ci fermiamo quando troviamo una cella vuota o arriviamo alla fine
+    // Iniziamo dalla colonna 3 (D) e ci fermiamo quando troviamo una cella vuota, un numero o arriviamo alla fine
     for (let C = 3; C <= range.e.c; ++C) {
         const cell = sheet[XLSX.utils.encode_cell({r: rigaGare, c: C})];
         
@@ -105,8 +105,15 @@ function estraiGareInfo(sheet) {
             break;
         }
         
-        const nomeGaraOriginale = cell.v.toString().trim();
-        const nomeGara = nomeGaraOriginale.toLowerCase();
+        const valoreCella = cell.v;
+        const valoreStringa = valoreCella.toString().trim();
+        const nomeGara = valoreStringa.toLowerCase();
+        
+        // MODIFICA: Se il valore è un numero, interrompiamo l'estrazione
+        if (typeof valoreCella === 'number' || !isNaN(valoreCella)) {
+            console.log(`Interrotto estrazione gare alla colonna ${C} - trovato numero: ${valoreCella}`);
+            break;
+        }
         
         // Se il nome della gara è "TEAM" o simile, interrompiamo
         if (nomeGara.includes('team') || nomeGara.includes('costruttori') || nomeGara.includes('classifica')) {
@@ -139,7 +146,7 @@ function estraiGareInfo(sheet) {
             gareInfo.push(circuitoTrovato);
         } else {
             gareInfo.push({
-                nome: nomeGaraOriginale,
+                nome: valoreStringa,
                 img: "https://flagcdn.com/w80/_unitednations.png"
             });
         }
@@ -442,24 +449,74 @@ async function estraiStoricoPilota(sheet, pilotaNome) {
 
 function getPole(sheet, nomePilota) {
     const range = XLSX.utils.decode_range(sheet['!ref']);
-    let startRow = -1;
+    let poles = 0, fl = 0;
+    
+    console.log(`🔍 Cercando Pole/FL per: ${nomePilota}`);
+    
+    // FASE 1: Trova qualsiasi riga che contenga "qualifica"
+    let rigaQualifica = -1;
     for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell = sheet[XLSX.utils.encode_cell({c:C,r:R})];
+            if (cell && cell.v && cell.v.toString().toLowerCase().includes('qualifica')) {
+                rigaQualifica = R;
+                console.log(`📊 Trovata sezione qualifica alla riga ${R}: "${cell.v}"`);
+                break;
+            }
+        }
+        if (rigaQualifica !== -1) break;
+    }
+    
+    if (rigaQualifica === -1) {
+        console.log("❌ Sezione qualifica non trovata");
+        return [0, 0];
+    }
+    
+    // FASE 2: Cerca il pilota nelle righe successive (controlla fino a fine foglio)
+    let rigaPilota = -1;
+    for (let R = rigaQualifica + 1; R <= range.e.r; ++R) {
         const cell = sheet[XLSX.utils.encode_cell({c:0,r:R})];
-        if (cell && cell.v === "TEMPI IN QUALIFICA") {
-            startRow = (nomePilota==="Manuel Bonelli") ? R+5 : R+3;
-            break;
+        // Se la prima cella non è vuota, potrebbe essere un pilota
+        if (cell && cell.v && cell.v.toString().trim() !== '') {
+            const cellValue = cell.v.toString();
+            // Controlla se è il nostro pilota
+            if (cellValue.toLowerCase().includes(nomePilota.toLowerCase())) {
+                rigaPilota = R;
+                console.log(`🎯 Trovato ${nomePilota} alla riga ${R}: "${cellValue}"`);
+                break;
+            }
         }
     }
-    if (startRow===-1) return [0,0];
-
-    let poles=0, fl=0;
-    for (let C=range.s.c; C<=range.e.c; C++) {
-        const cell = sheet[XLSX.utils.encode_cell({c:C,r:startRow})];
-        if (cell && typeof cell.v==="string") {
-            if (cell.v.toLowerCase().includes("pole")) poles++;
-            if (cell.v.includes("FL")) fl++;
+    
+    if (rigaPilota === -1) {
+        console.log(`❌ ${nomePilota} non trovato dopo la sezione qualifica`);
+        return [0, 0];
+    }
+    
+    // FASE 3: Analizza TUTTA la riga del pilota
+    console.log(`📝 Analizzando TUTTA la riga ${rigaPilota} per ${nomePilota}:`);
+    
+    for (let C = range.s.c; C <= range.e.c; ++C) {
+        const cell = sheet[XLSX.utils.encode_cell({c:C,r:rigaPilota})];
+        if (cell && cell.v) {
+            const cellValue = cell.v.toString();
+            
+            // Conta le Pole (case insensitive)
+            const lowerValue = cellValue.toLowerCase();
+            if (lowerValue.includes('pole')) {
+                poles++;
+                console.log(`   ✅ POLE alla colonna ${C}: "${cellValue}"`);
+            }
+            
+            // Conta i FL (case insensitive)
+            if (lowerValue.includes('fl')) {
+                fl++;
+                console.log(`   ✅ FL alla colonna ${C}: "${cellValue}"`);
+            }
         }
     }
+    
+    console.log(`🏁 RISULTATI FINALI per ${nomePilota}: ${poles} Pole, ${fl} FL`);
     return [poles, fl];
 }
 
