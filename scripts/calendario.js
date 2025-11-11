@@ -126,8 +126,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     image: '../../immagini/piste/buriram.jpg',
                     date: '28 Febbrario - 2 Marzo 2025'
                 },
-                'termas': {
-                    image: '../../immagini/piste/termasderiohondo.jpg',
+                'valencia1': {
+                    image: '../../immagini/piste/valencia.jpg',
                     date: '14-16 Marzo 2025'
                 },
                 'americhe': {
@@ -166,8 +166,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     image: '../../immagini/piste/sachsenring.jpg',
                     date: '11-13 Luglio 2025'
                 },
-                'brno': {
-                    image: '../../immagini/piste/brno.jpg',
+                'sokol': {
+                    image: '../../immagini/piste/sokol.jpg',
                     date: '18-20 Luglio 2025'
                 },
                 'redbullring': {
@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     image: '../../immagini/piste/portimao.jpg', 
                     date: '7-9 Novembre 2025'
                 },
-                'valencia': {
+                'valencia2': {
                     image: '../../immagini/piste/valencia.jpg',
                     date: '14-16 Novembre 2025'
                 }

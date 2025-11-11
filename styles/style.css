@@ -296,3 +296,11 @@
 .notizia-bolla:hover::after {
   opacity: 1;
 }
+
+.bandiera-notizia {
+  width: 20px;
+  height: 15px;
+  vertical-align: middle;
+  margin-right: 8px;
+  border-radius: 2px;
+}
