@@ -29,6 +29,26 @@ function formattaNomeTeam(nomeTeam) {
     // Ricostruisci la stringa
     return paroleCapitalizzate.join(' ').trim();
 }
+
+// FUNZIONE PER VERIFICARE SE ESISTE LA TABELLA "CLASSIFICA PILOTI"
+function esisteClassificaPiloti(sheet) {
+    const range = XLSX.utils.decode_range(sheet['!ref']);
+    
+    // Cerca la tabella "CLASSIFICA PILOTI" nel foglio
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell = sheet[XLSX.utils.encode_cell({c: C, r: R})];
+            if (cell && cell.v && cell.v.toString().toLowerCase().includes('classifica piloti')) {
+                console.log("✅ Tabella 'CLASSIFICA PILOTI' trovata");
+                return true;
+            }
+        }
+    }
+    
+    console.log("❌ Tabella 'CLASSIFICA PILOTI' non trovata");
+    return false;
+}
+
 // FUNZIONE PER ESTRARRE DINAMICAMENTE LE GARE DAL FILE EXCEL
 function estraiGareInfo(sheet) {
     const gareInfo = [];
@@ -184,31 +204,31 @@ async function processExcelFile(filePath) {
 
         const classificaPiloti = estraiClassificaPilotiCompleta(sheet);
         
-        if (classificaPiloti && classificaPiloti.length > 0) {
-            try {
-                const classificaFinale = calcolaClassificaFinale(classificaPiloti, sheet);
-                console.log(`🏆 CLASSIFICA FINALE ${anno}:`, classificaFinale.map((p, i) => `${i+1}°: ${p.Pilota} - ${p.Punti} punti`));
-            } catch (error) {
-                console.log(`Classifica finale ${anno} non calcolabile, ma continuo con i dati base`);
-            }
+        // MODIFICA: Verifica se esiste la tabella CLASSIFICA PILOTI prima di calcolare il campionato
+        const classificaFinale = esisteClassificaPiloti(sheet) ? calcolaClassificaFinale(classificaPiloti, sheet) : null;
+        
+        if (classificaFinale) {
+            console.log(`🏆 CLASSIFICA FINALE ${anno}:`, classificaFinale.map((p, i) => `${i+1}°: ${p.Pilota} - ${p.Punti} punti`));
         } else {
-            console.log(`Nessun dato di classifica disponibile per ${anno}`);
+            console.log(`ℹ️ Campionato ${anno} ancora in corso - nessuna classifica finale disponibile`);
         }
 
         const storicoBonelli = await estraiStoricoPilota(sheet, "Manuel Bonelli");
         const storicoGabrielli = await estraiStoricoPilota(sheet, "Lorenzo Gabrielli");
 
-        if (storicoBonelli) aggiornaStatistiche(sheet, storicoBonelli, classificaPiloti, anno);
-        if (storicoGabrielli) aggiornaStatistiche(sheet, storicoGabrielli, classificaPiloti, anno);
+        // MODIFICA: Passa classificaFinale invece di classificaPiloti
+        if (storicoBonelli) aggiornaStatistiche(sheet, storicoBonelli, classificaFinale, anno);
+        if (storicoGabrielli) aggiornaStatistiche(sheet, storicoGabrielli, classificaFinale, anno);
 
         return {
             anno,
             categoria,
             gareInfo,
-            classificaPiloti,
+            classificaPiloti: classificaFinale || classificaPiloti, // Usa classifica finale se disponibile
             storicoBonelli,
             storicoGabrielli,
-            sheet
+            sheet,
+            campionatoCompletato: !!classificaFinale
         };
 
     } catch (error) {
@@ -272,16 +292,16 @@ function mostraRisultatiNelDOM(risultati) {
     const storicoGabrielli = [];
     
     risultati.forEach(risultato => {
-        const { anno, categoria, gareInfo, storicoBonelli: sb, storicoGabrielli: sg, classificaPiloti, sheet } = risultato;
+        const { anno, categoria, gareInfo, storicoBonelli: sb, storicoGabrielli: sg, classificaPiloti, sheet, campionatoCompletato } = risultato;
         
         if (sb) {
             storicoBonelli.push({
-                anno, categoria, gareInfo, storicoPilota: sb, classificaPiloti, sheet
+                anno, categoria, gareInfo, storicoPilota: sb, classificaPiloti, sheet, campionatoCompletato
             });
         }
         if (sg) {
             storicoGabrielli.push({
-                anno, categoria, gareInfo, storicoPilota: sg, classificaPiloti, sheet
+                anno, categoria, gareInfo, storicoPilota: sg, classificaPiloti, sheet, campionatoCompletato
             });
         }
     });
@@ -319,7 +339,8 @@ function mostraRisultatiNelDOM(risultati) {
                 dati.categoria, 
                 dati.classificaPiloti, 
                 dati.sheet, 
-                dati.gareInfo
+                dati.gareInfo,
+                dati.campionatoCompletato
             );
             // Rimuovi il margine inferiore per attaccare le tabelle
             tabella.style.marginBottom = '0';
@@ -365,7 +386,8 @@ function mostraRisultatiNelDOM(risultati) {
                 dati.categoria, 
                 dati.classificaPiloti, 
                 dati.sheet, 
-                dati.gareInfo
+                dati.gareInfo,
+                dati.campionatoCompletato
             );
             // Rimuovi il margine inferiore per attaccare le tabelle
             tabella.style.marginBottom = '0';
@@ -520,15 +542,13 @@ function getPole(sheet, nomePilota) {
     return [poles, fl];
 }
 
-function verificaVincitoreCampionato(nomePilota, classificaPiloti, sheet) {
-    if (!classificaPiloti || classificaPiloti.length === 0) {
-        console.log("Classifica piloti vuota o non disponibile");
+function verificaVincitoreCampionato(nomePilota, classificaFinale) {
+    if (!classificaFinale || classificaFinale.length === 0) {
+        console.log("Classifica finale non disponibile");
         return false;
     }
     
     try {
-        const classificaFinale = calcolaClassificaFinale(classificaPiloti, sheet);
-        
         if (classificaFinale.length > 0) {
             const primoClassificato = classificaFinale[0];
             const isVincitore = primoClassificato.Pilota && 
@@ -639,7 +659,8 @@ function calcolaClassificaFinale(classificaPiloti, sheet) {
     }
 }
 
-function aggiornaStatistiche(sheet, storicoPilota, classificaPiloti, anno) {
+// MODIFICA: Aggiornata per usare classificaFinale invece di classificaPiloti
+function aggiornaStatistiche(sheet, storicoPilota, classificaFinale, anno) {
     if (!storicoPilota) return;
     
     const nome = storicoPilota[0];
@@ -665,9 +686,10 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaPiloti, anno) {
         }
     }
     
-    if (classificaPiloti && classificaPiloti.length > 0) {
+    // MODIFICA: Aggiorna i mondiali solo se la classifica finale è disponibile
+    if (classificaFinale && classificaFinale.length > 0) {
         try {
-            if (verificaVincitoreCampionato(nome, classificaPiloti, sheet)) {
+            if (verificaVincitoreCampionato(nome, classificaFinale)) {
                 pilota.Mondiali++;
                 console.log(`🎉 ${nome} ha vinto il campionato ${anno}! Mondiali: ${pilota.Mondiali}`);
             }
@@ -675,7 +697,7 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaPiloti, anno) {
             console.error(`Errore nella verifica del campionato per ${nome}:`, error);
         }
     } else {
-        console.log(`Classifica non disponibile per verificare il campionato di ${nome}`);
+        console.log(`Classifica finale non disponibile per ${anno} - nessun mondiale aggiunto per ${nome}`);
     }
 }
 
@@ -804,10 +826,8 @@ function calcolaPosizioneInClassifica(nomePilota, classificaPiloti, sheet) {
     }
     
     try {
-        const classificaFinale = calcolaClassificaFinale(classificaPiloti, sheet);
-        
         const nomeCercato = nomePilota.trim().toLowerCase();
-        const posizione = classificaFinale.findIndex(pilota => {
+        const posizione = classificaPiloti.findIndex(pilota => {
             if (!pilota || !pilota.Pilota) return false;
             return pilota.Pilota.toString().trim().toLowerCase() === nomeCercato;
         });
@@ -895,8 +915,8 @@ function createTabellaPilota(pilota) {
     return container;
 }
 
-// MODIFICA: Aggiorna la funzione createTabellaStorico per rimuovere il nome dalla tabella
-function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, sheet, gareInfo) {
+// MODIFICA: Aggiornata per gestire campionati in corso vs completati
+function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, sheet, gareInfo, campionatoCompletato) {
     if (!storicoPilota) {
         const errorDiv = document.createElement('div');
         errorDiv.textContent = "Dati pilota non disponibili";
@@ -905,10 +925,10 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
 
     const nome = storicoPilota[0];
     const puntiTot = storicoPilota[1] || 0;
-    const moto = formattaNomeTeam(storicoPilota[2] || "N/D"); // MODIFICA: formatta il nome della moto
+    const moto = formattaNomeTeam(storicoPilota[2] || "N/D");
     const gareRisultati = storicoPilota.slice(3);
 
-    const posizione = calcolaPosizioneInClassifica(nome, classificaPiloti, sheet);
+    const posizione = campionatoCompletato ? calcolaPosizioneInClassifica(nome, classificaPiloti, sheet) : "-";
 
     const table = document.createElement('table');
     table.className = "wikitable";
@@ -955,11 +975,12 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
         row.innerHTML += `<td class="${classe}" style="height: 50px;">${pos !== '-' ? pos : '-'}</td>`;
     }
     
-    row.innerHTML += `<td style="height: 50px;">${puntiTot}</td><td style="height: 50px;">${posizione}°</td>`;
+    row.innerHTML += `<td style="height: 50px;">${puntiTot}</td><td style="height: 50px;">${posizione}${campionatoCompletato ? '°' : ''}</td>`;
     table.appendChild(row);
 
     return table;
 }
+
 // Avvio
 document.addEventListener('DOMContentLoaded', function() {
     main().catch(err => console.error(err));
