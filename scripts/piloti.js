@@ -676,14 +676,23 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaFinale, anno) {
     pilota.Moto = moto;
 
     for (let g of gare) {
-        if (g != null && g !== '' && g !== 'RIT') {
+        // MODIFICA: Conta SOLO le gare con "RIT" o numeri (gare partecipate)
+        // Celle vuote = gara non ancora disputata → NON conta
+        // NP = non partecipato → NON conta
+        if (g === 'RIT' || g === 'rit' || (g != null && g !== '' && !isNaN(Number(g)))) {
             pilota.Gare++;
-            const posizione = Number(g);
-            if (!isNaN(posizione) && posizione <= 3) {
-                pilota.Podi++;
-                if(posizione === 1) pilota.Vittorie++;
+            
+            // Solo per risultati numerici (posizioni) calcola podi e vittorie
+            if (g !== 'RIT' && g !== 'rit') {
+                const posizione = Number(g);
+                if (posizione <= 3) {
+                    pilota.Podi++;
+                    if(posizione === 1) pilota.Vittorie++;
+                }
             }
         }
+        // Celle vuote/null = non contano (gare future o non disputate)
+        // NP = non contano (esplicitamente non partecipato)
     }
     
     // MODIFICA: Aggiorna i mondiali solo se la classifica finale è disponibile
