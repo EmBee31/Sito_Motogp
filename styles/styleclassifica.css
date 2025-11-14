@@ -242,13 +242,13 @@
 /* Medaglie per i primi 3 */
 .classifica-table tbody tr:first-child {
     background: linear-gradient(135deg, #fff9e6, #ffeb99);
-    border-left: 4px solid #FFD700; /* Oro */
 }
 
 .classifica-table tbody tr:first-child td:first-child {
     background: linear-gradient(135deg, #FFD700, #FFED4E);
     color: #b8860b;
     font-weight: bold;
+    box-shadow: inset 4px 0 0 #FFD700; /* Oro */
 }
 
 .classifica-table tbody tr:first-child td:first-child::before {
@@ -256,15 +256,11 @@
     margin-right: 5px;
 }
 
-.classifica-table tbody tr:nth-child(2) {
-    background: linear-gradient(135deg, #f8f8f8, #e8e8e8);
-    border-left: 4px solid #C0C0C0; /* Argento */
-}
-
 .classifica-table tbody tr:nth-child(2) td:first-child {
     background: linear-gradient(135deg, #C0C0C0, #E8E8E8);
     color: #808080;
     font-weight: bold;
+    box-shadow: inset 4px 0 0 #C0C0C0; /* Argento */
 }
 
 .classifica-table tbody tr:nth-child(2) td:first-child::before {
@@ -272,15 +268,11 @@
     margin-right: 5px;
 }
 
-.classifica-table tbody tr:nth-child(3) {
-    background: linear-gradient(135deg, #fff4e6, #ffd8b3);
-    border-left: 4px solid #CD7F32; /* Bronzo */
-}
-
 .classifica-table tbody tr:nth-child(3) td:first-child {
     background: linear-gradient(135deg, #CD7F32, #E8B886);
     color: #a56a2a;
     font-weight: bold;
+    box-shadow: inset 4px 0 0 #CD7F32; /* Bronzo */
 }
 
 .classifica-table tbody tr:nth-child(3) td:first-child::before {
@@ -288,14 +280,18 @@
     margin-right: 5px;
 }
 
-/* Numeri di posizione per le righe successive */
+/* Numeri di posizione per le righe successive con shadow bianco */
+.classifica-table tbody tr:nth-child(n+4) td:first-child {
+    box-shadow: inset 2px 0 0 #ffffff; /* bordo bianco */
+}
+
 .classifica-table tbody tr:nth-child(n+4) td:first-child::before {
     content: counter(row-number);
     counter-increment: row-number;
 }
 
 .classifica-table tbody {
-    counter-reset: row-number 3; /* Inizia dal 4 (3+1) */
+    counter-reset: row-number 3; /* Inizia dal 4 */
 }
 
 /* Righe alternate per le posizioni successive */
@@ -321,6 +317,28 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .navbar {
+        position: relative;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 0;
+    }
+    
+    .navbar ul {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .navbar a, .dropbtn {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+    
+    .banner {
+        height: 200px;
+        object-fit: cover;
+    }
+
     .classifica_buttons {
         flex-direction: column;
         align-items: center;

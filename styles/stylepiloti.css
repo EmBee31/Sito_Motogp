@@ -122,59 +122,81 @@
     padding: 30px 10px;
     width: 100%;
     max-width: none;
+    box-sizing: border-box;
 }
 
 /* Tabelle generiche */
 table {
     border-collapse: collapse;
-    margin: 10px;
+    margin: 0;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     width: 100%;
+    table-layout: fixed;
+    box-sizing: border-box;
 }
 
-/* Celle e bordi - BORDI GRIGIO SCURO */
-table, th, td {
-    border: 1px solid #666666; /* GRIGIO SCURO */
+/* Celle e bordi interni */
+th, td {
+    border: 1px solid #ddd;
     text-align: center;
+    padding: 8px;
+    box-sizing: border-box;
 }
 
-/* Infobox pilota */
+/* Infobox pilota - bordo unico e continuo */
 .infobox {
     width: 280px;
     background-color: #f9f9f9;
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+    border: 2px solid #666666;
+    display: table;
 }
 
+/* Celle intestazione */
 .infobox th {
     background-color: #2c3e50;
     font-size: 16px;
     padding: 12px;
-    border: 1px solid #666666; /* GRIGIO SCURO */
-}
-
-.infobox th:first-child {
     color: #fff;
-    background-color: #2c3e50;
-    font-size: 18px;
+    text-align: center;
+    border: none;
 }
 
+/* Primo th (titolo) */
+.infobox th:first-child {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+/* Celle contenuto */
 .infobox td {
     font-size: 14px;
     padding: 10px;
-    border: 1px solid #666666; /* GRIGIO SCURO */
+    text-align: center;
+    border: none;
 }
 
-/* Tabella storico gare - BORDI GRIGIO SCURO */
+/* Riga dispari/pari per distinguere visivamente le celle */
+.infobox tr:nth-child(odd) td {
+    background-color: #f9f9f9;
+}
+
+.infobox tr:nth-child(even) td {
+    background-color: #f0f0f0;
+}
+
+/* Tabella storico gare */
 .wikitable {
     background-color: #fff;
     border-radius: 10px;
     overflow: hidden;
     width: 100%;
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
-    table-layout: fixed;
-    border: 1px solid #666666; /* GRIGIO SCURO */
+    border: 2px solid #333;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .wikitable th {
@@ -189,7 +211,7 @@ table, th, td {
     max-height: 60px;
     vertical-align: middle;
     line-height: 1.2;
-    border: 1px solid #666666; /* GRIGIO SCURO */
+    border: 1px solid #ddd;
 }
 
 .wikitable td {
@@ -200,7 +222,7 @@ table, th, td {
     max-height: 50px;
     vertical-align: middle;
     line-height: 1.2;
-    border: 1px solid #666666; /* GRIGIO SCURO */
+    border: 1px solid #ddd;
 }
 
 .wikitable th img {
@@ -221,45 +243,39 @@ table, th, td {
     background-color: #ffffff;
 }
 
-/* Colori posizioni - BORDI GRIGIO SCURO */
+/* Colori posizioni */
 .posizione-1 {
     background-color: #FFD700;
     color: #000;
     font-weight: bold;
-    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .posizione-2 {
     background-color: #C0C0C0;
     color: #000;
     font-weight: bold;
-    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .posizione-3 {
     background-color: #CD7F32;
     color: #fff;
     font-weight: bold;
-    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .posizione-punti {
     background-color: #DFD;
     color: #000;
-    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .ritirato {
     background-color: #FDD;
     color: #000;
-    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 .non-classificato {
     background-color: #EEE;
     color: #666;
     font-style: italic;
-    border: 1px solid #666666; /* GRIGIO SCURO */
 }
 
 /* Celle minime */
@@ -271,14 +287,19 @@ table, th, td {
     min-width: 60px;
 }
 
-/* Tabelle attaccate - BORDI GRIGIO SCURO */
+/* Tabelle attaccate */
 .tables-container-attached {
-    border: 1px solid #666666; /* GRIGIO SCURO */
+    border: 2px solid #333;
     border-radius: 10px;
-    overflow: hidden;
+    overflow: hidden; /* Questo è importante per nascondere gli angoli */
     box-shadow: 0 4px 16px rgba(0,0,0,0.15);
     width: 100%;
     display: block;
+    max-width: 100%;
+    box-sizing: border-box;
+    /* Rimuovi ogni spazio interno */
+    padding: 0;
+    margin: 0;
 }
 
 .tables-container-attached table {
@@ -287,38 +308,49 @@ table, th, td {
     box-shadow: none;
     width: 100%;
     border-collapse: collapse;
+    /* Assicurati che non ci siano spazi */
+    border-spacing: 0;
 }
 
 .tables-container-attached table:not(:last-child) {
-    border-bottom: 1px solid #666666; /* GRIGIO SCURO */
+    border-bottom: 2px solid #333;
 }
 
 .tables-container-attached .wikitable {
     border: none;
-    border-bottom: 1px solid #666666; /* GRIGIO SCURO */
+    /* Rimuovi ogni bordo esterno della tabella */
+    border-radius: 0;
 }
 
-.tables-container-attached .wikitable:last-child {
-    border-bottom: none;
+.tables-container-attached .wikitable:not(:last-child) {
+    border-bottom: 2px solid #333;
 }
 
-.tables-container-attached .wikitable tr:last-child td {
-    border-bottom: 1px solid #666666; /* GRIGIO SCURO */
-}
-
+/* CORREZIONE PER LE CELLE - bordo grigio scuro uniforme */
 .tables-container-attached .wikitable th,
 .tables-container-attached .wikitable td {
     height: 50px;
     min-height: 50px;
     max-height: 50px;
     vertical-align: middle;
-    border: 1px solid #666666; /* GRIGIO SCURO */
+    border: 1px solid #666666 !important; /* Forza il bordo grigio scuro */
 }
 
 .tables-container-attached .wikitable th {
     height: 60px;
     min-height: 60px;
     max-height: 60px;
+    border: 1px solid #666666 !important; /* Forza il bordo grigio scuro */
+}
+
+/* CORREZIONE PER LA PRIMA TABELLA - rimuovi bordo superiore */
+.tables-container-attached .wikitable:first-child {
+    border-top: none;
+}
+
+/* CORREZIONE PER L'ULTIMA TABELLA - rimuovi bordo inferiore */
+.tables-container-attached .wikitable:last-child {
+    border-bottom: none;
 }
 
 /* Sezioni pilota */
@@ -333,33 +365,119 @@ table, th, td {
     width: 100%;
     max-width: none;
     padding: 0 10px;
+    box-sizing: border-box;
+}
+
+/* Container per tabelle larghe */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+/* Per mantenere la tabella larga ma contenuta */
+.wikitable-wide {
+    min-width: 800px;
 }
 
 /* Responsive */
 @media (max-width: 900px) {
-    .tabelle-container {
+
+    /* Navbar responsive */
+    .navbar {
+        position: relative;
         flex-direction: column;
-        align-items: center;
+        gap: 10px;
+        padding: 10px 0;
     }
+
     .navbar ul {
         flex-direction: column;
         gap: 15px;
     }
-    .banner {
-        height: 400px;
+
+    .navbar a, .dropbtn {
+        font-size: 16px;
+        margin: 5px 0;
     }
+
+    /* Banner ridotto su mobile */
+    .banner {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    /* Container tabelle e infobox responsive */
+    .tabelle-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 15px 5px;
+    }
+
     .infobox, .wikitable {
+        width: 95%;
         max-width: 95%;
     }
-    
+
+    /* --- Tabelle storico --- */
+    .tables-container-attached {
+        width: 100%;
+        overflow-x: visible; /* Rimuove scroll globale */
+    }
+
+    /* Wrapper scroll per ogni tabella */
+    .wikitable-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin-bottom: 10px;
+    }
+
+    /* La tabella mantiene layout originale */
+    .wikitable-wrapper .wikitable {
+        min-width: 800px; /* larghezza minima per scroll */
+        width: 100%;
+        border-radius: 8px;
+    }
+
+    /* Tabelle larghe generiche */
+    .wikitable-wide {
+        min-width: 800px;
+    }
+
+    /* Celle e font più piccoli su mobile */
     .wikitable th,
     .wikitable td {
         padding: 6px 3px;
         font-size: 12px;
+        height: auto;
+        min-height: 40px;
     }
-    
+
     .wikitable th img {
-        width: 30px;
-        height: 15px;
+        width: 25px;
+        height: auto;
+    }
+
+    /* Celle delle tabelle storico */
+    .tables-container-attached .wikitable th,
+    .tables-container-attached .wikitable td {
+        padding: 6px 4px;
+        font-size: 11px;
+        min-height: 35px;
+        height: 35px;
+    }
+
+    .tables-container-attached .wikitable th {
+        min-height: 45px;
+        height: 45px;
+    }
+
+    /* Rimuove scroll dai container inutili */
+    .table-container {
+        width: 100%;
+        overflow-x: visible;
     }
 }

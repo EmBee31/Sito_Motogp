@@ -936,9 +936,9 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
     const puntiTot = storicoPilota[1] || 0;
     const moto = formattaNomeTeam(storicoPilota[2] || "N/D");
     const gareRisultati = storicoPilota.slice(3);
-
     const posizione = campionatoCompletato ? calcolaPosizioneInClassifica(nome, classificaPiloti, sheet) : "-";
 
+    // --- CREA LA TABELLA ---
     const table = document.createElement('table');
     table.className = "wikitable";
     table.style.marginBottom = '0';
@@ -952,14 +952,14 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
         <th style="width: 100px; height: 60px;">Categoria</th>
         <th style="width: 120px; height: 60px;">Moto</th>
     `;
-    
-    // Calcola la larghezza per le colonne delle gare
+
     const larghezzaGara = Math.max(50, Math.floor((100 - 300) / gareInfo.length));
-    
     for (let g of gareInfo) {
-        header.innerHTML += `<th style="width: ${larghezzaGara}px; height: 60px;"><img src="${g.img}" width="40" height="20" alt="${g.nome}" title="${g.nome}"></th>`;
+        header.innerHTML += `<th style="width: ${larghezzaGara}px; height: 60px;">
+            <img src="${g.img}" width="40" height="20" alt="${g.nome}" title="${g.nome}">
+        </th>`;
     }
-    
+
     header.innerHTML += `<th style="width: 80px; height: 60px;">Punti</th><th style="width: 60px; height: 60px;">Pos.</th>`;
     table.appendChild(header);
 
@@ -969,26 +969,32 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
         <td style="height: 50px;">${categoria}</td>
         <td style="height: 50px;">${moto}</td>
     `;
-    
+
     for (let i = 0; i < gareInfo.length; i++) {
         const pos = gareRisultati[i] != null ? gareRisultati[i] : '-';
         let classe = '';
-        
+
         if (pos === 1) classe = 'posizione-1';
         else if (pos === 2) classe = 'posizione-2';
         else if (pos === 3) classe = 'posizione-3';
         else if (pos >= 4 && pos <= 15) classe = 'posizione-punti';
         else if (pos === 'RIT' || pos === 'rit') classe = 'ritirato';
         else if (pos === '-' || pos === null || pos === '') classe = 'non-classificato';
-        
+
         row.innerHTML += `<td class="${classe}" style="height: 50px;">${pos !== '-' ? pos : '-'}</td>`;
     }
-    
+
     row.innerHTML += `<td style="height: 50px;">${puntiTot}</td><td style="height: 50px;">${posizione}${campionatoCompletato ? '°' : ''}</td>`;
     table.appendChild(row);
 
-    return table;
+    // --- WRAPPER SCORRIBILE SOLO MOBILE ---
+    const wrapper = document.createElement('div');
+    wrapper.className = "wikitable-wrapper";
+    wrapper.appendChild(table);
+
+    return wrapper; // restituisce il wrapper, non la tabella
 }
+
 
 // Avvio
 document.addEventListener('DOMContentLoaded', function() {

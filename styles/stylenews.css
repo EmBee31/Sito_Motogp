@@ -422,22 +422,7 @@
     border-bottom: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .rating-table th, .rating-table td {
-        font-size: 0.9em;
-        padding: 0.8em;
-    }
 
-    .pilota-image {
-        width: 40px;
-        height: 40px;
-    }
-
-    .rating-table td.desc-cell {
-        text-align: center;
-    }
-}
 
 .pilota-cell {
     display: flex;
@@ -546,21 +531,82 @@
     color: #fff;
 }
 
+
 /* Responsive */
 @media (max-width: 768px) {
-    .flags-1, .flags-2, .flags-3 {
-        gap: 15px;
-        padding: 20px;
+    .navbar {
+        position: relative;
+        flex-direction: column;
+        gap: 10px;
+        padding: 10px 0;
     }
     
+    .navbar ul {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .navbar a, .dropbtn {
+        font-size: 16px;
+        margin: 5px 0;
+    }
+    
+    .banner {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .flags-1, .flags-2, .flags-3 {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px; /* distanza tra le card all’interno dello stesso container */
+        padding: 0;
+        margin: 0 0 15px 0; /* distanza tra i container */
+    }
+
+    /* Rimuove il margin dall’ultimo container */
+    .flags-3 {
+        margin-bottom: 50px;
+    }
+
+    /* Le card singole non hanno margini aggiuntivi */
     .flag-card-1, .flag-card-2, .flag-card-3 {
-        width: 130px;
+        width: 150px;
+        margin: 0;
+    }
+    
+    .track-info {
+        margin: 20px auto;
+    }
+    
+    .track-date {
+        font-size: 24px;
+    }
+    
+    .risultati-btn {
+        padding: 12px 25px;
+        font-size: 16px;
+    }
+    
+    .news_header {
+        margin-top: 150px;
+    }
+    
+    .news_header h1 {
+        font-size: 1.5rem;
     }
     
     #contenuto-testo {
         width: 95%;
         padding: 20px 15px;
         margin: 15px auto;
+        display: flex;
+        flex-direction: column;  /* utile se ci saranno più elementi */
+        justify-content: center; /* centra verticalmente */
+        align-items: center;     /* centra orizzontalmente */
+        text-align: center;      /* centra il testo multilinea */
+        min-height: 80px;        /* opzionale, per dare altezza al box */
     }
     
     #contenuto-testo::before {
@@ -577,17 +623,40 @@
     
     .quote-logo {
         margin-right: 0;
-        margin-bottom: 1em;
+        margin-bottom: 15px;
     }
     
     .table-section {
         padding: 15px;
+        overflow-x: auto;
     }
     
     .rating-table {
-        font-size: 0.9em;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        border-collapse: separate;
     }
-    
+
+    .rating-table tr {
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        margin-bottom: 10px;
+        /* Rimuoviamo background bianco fisso per preservare i colori */
+        background: inherit; 
+    }
+
+    .rating-table th,
+    .rating-table td {
+        padding: 6px 0;
+        text-align: center; 
+        width: 100%;
+    }
+
     .track-image {
         max-width: 90%;
     }
