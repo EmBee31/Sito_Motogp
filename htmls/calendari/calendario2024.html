@@ -11,14 +11,16 @@
         <ul>
             <a href="../../index.html">Home</a>
             <div class="dropdown">
-                <button class="dropbtn">Calendario ▼</button>
+                <input type="checkbox" id="drop1" class="drop-toggle">
+                <label for="drop1" class="dropbtn">Calendario ▼</label>
                 <div class="dropdown-content">
                     <a href="calendario2024.html">Stagione 2024 - Moto3</a>
                     <a href="calendario2025.html">Stagione 2025 - Moto2</a>
                 </div>
             </div>
             <div class="dropdown">
-                <button class="dropbtn">Classifica ▼</button>
+                <input type="checkbox" id="drop2" class="drop-toggle">
+                <label for="drop2" class="dropbtn">Classifica ▼</label>
                 <div class="dropdown-content">
                     <a href="../classifiche/classifica2024.html">Stagione 2024 - Moto3</a>
                     <a href="../classifiche/classifica2025.html">Stagione 2025 - Moto2</a>
@@ -147,5 +149,22 @@
     <footer>
         <p>&copy; 2025 AngoloMoto. Tutti i diritti riservati.</p>
     </footer>
+
+
+    <script>
+        document.addEventListener("click", function(e) {
+            const dropdowns = document.querySelectorAll(".dropdown");
+        
+            dropdowns.forEach(drop => {
+                const checkbox = drop.querySelector(".drop-toggle");
+        
+                // se clicco fuori dal dropdown → chiudo
+                if (!drop.contains(e.target)) {
+                    checkbox.checked = false;
+                }
+            });
+        });
+    </script>
+
 </body>
 </html>
