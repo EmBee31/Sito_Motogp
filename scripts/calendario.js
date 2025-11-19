@@ -273,15 +273,17 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function scrollToCalendario() {
-        const flagsContainer = document.querySelector('.flags-3');
-        if (flagsContainer) {
-            flagsContainer.scrollIntoView({ 
-                behavior: 'smooth',
-                block: 'center' // Centra verticalmente nella viewport
-            });
+        // Controlla se lo schermo è "grande" (PC) - ad esempio più di 768px di larghezza
+        if (window.innerWidth > 768) {
+            const flagsContainer = document.querySelector('.flags-3');
+            if (flagsContainer) {
+                flagsContainer.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'center' // Centra verticalmente nella viewport
+                });
+            }
         }
     }
-
     async function caricaGara(nomeGara) {
         const basePath = getBasePath();
         const textFile = `${basePath}/${nomeGara}.txt`;
