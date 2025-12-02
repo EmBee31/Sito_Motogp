@@ -9,6 +9,9 @@ const excelFiles = [
     '../docs/classifiche/classifica2026.xlsx'
 ];
 
+// Variabile per memorizzare il numero di gare per anno
+let numeroGarePerAnno = {};
+
 function formattaNomeTeam(nomeTeam) {
     if (!nomeTeam || typeof nomeTeam !== 'string') {
         return nomeTeam || "N/D";
@@ -49,7 +52,7 @@ function esisteClassificaPiloti(sheet) {
     return false;
 }
 
-// FUNZIONE PER ESTRARRE DINAMICAMENTE LE GARE DAL FILE EXCEL
+// MODIFICA: FUNZIONE PER ESTRARRE DINAMICAMENTE E CONTARE LE GARE DAL FILE EXCEL
 function estraiGareInfo(sheet) {
     const gareInfo = [];
     const range = XLSX.utils.decode_range(sheet['!ref']);
@@ -114,14 +117,16 @@ function estraiGareInfo(sheet) {
     
     const contatoriPiste = {};
     
-    // MODIFICA: Controlliamo quando fermarci nell'estrazione delle colonne
-    // Iniziamo dalla colonna 3 (D) e ci fermiamo quando troviamo una cella vuota, un numero o arriviamo alla fine
+    // CONTEGGIO EFFETTIVO DELLE GARE
+    // Iniziamo dalla colonna 3 (D) che è la prima colonna di gara dopo: 0=Pilota, 1=Punti, 2=Scuderia
+    let numeroGare = 0;
+    
     for (let C = 3; C <= range.e.c; ++C) {
         const cell = sheet[XLSX.utils.encode_cell({r: rigaGare, c: C})];
         
-        // Se la cella è vuota o non esiste, interrompiamo l'estrazione
+        // Se la cella è vuota o non esiste, TERMINA il conteggio
         if (!cell || !cell.v || cell.v.toString().trim() === '') {
-            console.log(`Interrotto estrazione gare alla colonna ${C} - cella vuota`);
+            console.log(`Terminato conteggio gare alla colonna ${C} - cella vuota`);
             break;
         }
         
@@ -129,18 +134,23 @@ function estraiGareInfo(sheet) {
         const valoreStringa = valoreCella.toString().trim();
         const nomeGara = valoreStringa.toLowerCase();
         
-        // MODIFICA: Se il valore è un numero, interrompiamo l'estrazione
-        if (typeof valoreCella === 'number' || !isNaN(valoreCella)) {
-            console.log(`Interrotto estrazione gare alla colonna ${C} - trovato numero: ${valoreCella}`);
+        // Se il valore è un numero (non è il nome di una gara), TERMINA
+        if (typeof valoreCella === 'number' || !isNaN(parseFloat(valoreStringa))) {
+            console.log(`Terminato conteggio gare alla colonna ${C} - trovato numero: ${valoreCella}`);
             break;
         }
         
-        // Se il nome della gara è "TEAM" o simile, interrompiamo
-        if (nomeGara.includes('team') || nomeGara.includes('costruttori') || nomeGara.includes('classifica')) {
-            console.log(`Interrotto estrazione gare alla colonna ${C} - trovata sezione team`);
+        // Se il nome della gara è "TEAM" o riferimenti a sezioni successive, TERMINA
+        if (nomeGara.includes('team') || nomeGara.includes('costruttori') || 
+            nomeGara.includes('classifica') || nomeGara.includes('qualifica')) {
+            console.log(`Terminato conteggio gare alla colonna ${C} - trovata sezione: ${valoreStringa}`);
             break;
         }
         
+        // AUMENTA IL CONTATORE DELLE GARE
+        numeroGare++;
+        
+        // Processa la gara
         let circuitoTrovato = null;
         let chiaveTrovata = null;
         
@@ -172,7 +182,8 @@ function estraiGareInfo(sheet) {
         }
     }
     
-    console.log("Gare estratte dinamicamente:", gareInfo.length, "gare:", gareInfo);
+    console.log(`🏁 Gare estratte dinamicamente: ${numeroGare} gare totali`);
+    console.log("Lista gare:", gareInfo);
     return gareInfo;
 }
 
@@ -196,6 +207,9 @@ async function processExcelFile(filePath) {
         console.log(`Anno e categoria da ${filePath}:`, anno, categoria);
 
         const gareInfo = estraiGareInfo(sheet);
+        
+        // Memorizza il numero di gare per questo anno
+        numeroGarePerAnno[anno] = gareInfo.length;
 
         if (gareInfo.length === 0) {
             console.log(`❌ Nessuna gara trovata nel file ${filePath}`);
@@ -204,27 +218,28 @@ async function processExcelFile(filePath) {
 
         const classificaPiloti = estraiClassificaPilotiCompleta(sheet);
         
-        // MODIFICA: Verifica se esiste la tabella CLASSIFICA PILOTI prima di calcolare il campionato
+        // Verifica se esiste la tabella CLASSIFICA PILOTI prima di calcolare il campionato
         const classificaFinale = esisteClassificaPiloti(sheet) ? calcolaClassificaFinale(classificaPiloti, sheet) : null;
         
         if (classificaFinale) {
             console.log(`🏆 CLASSIFICA FINALE ${anno}:`, classificaFinale.map((p, i) => `${i+1}°: ${p.Pilota} - ${p.Punti} punti`));
         } else {
-            console.log(`ℹ️ Campionato ${anno} ancora in corso - nessuna classifica finale disponibile`);
+            console.log(`ℹ️ Campionato ${anno} ancora in corso - ${gareInfo.length} gare programmate`);
         }
 
-        const storicoBonelli = await estraiStoricoPilota(sheet, "Manuel Bonelli");
-        const storicoGabrielli = await estraiStoricoPilota(sheet, "Lorenzo Gabrielli");
+        const storicoBonelli = await estraiStoricoPilota(sheet, "Manuel Bonelli", gareInfo.length);
+        const storicoGabrielli = await estraiStoricoPilota(sheet, "Lorenzo Gabrielli", gareInfo.length);
 
-        // MODIFICA: Passa classificaFinale invece di classificaPiloti
-        if (storicoBonelli) aggiornaStatistiche(sheet, storicoBonelli, classificaFinale, anno);
-        if (storicoGabrielli) aggiornaStatistiche(sheet, storicoGabrielli, classificaFinale, anno);
+        // Passa anche il numero di gare a aggiornaStatistiche
+        if (storicoBonelli) aggiornaStatistiche(sheet, storicoBonelli, classificaFinale, anno, gareInfo.length);
+        if (storicoGabrielli) aggiornaStatistiche(sheet, storicoGabrielli, classificaFinale, anno, gareInfo.length);
 
         return {
             anno,
             categoria,
             gareInfo,
-            classificaPiloti: classificaFinale || classificaPiloti, // Usa classifica finale se disponibile
+            numeroGare: gareInfo.length,
+            classificaPiloti: classificaFinale || classificaPiloti,
             storicoBonelli,
             storicoGabrielli,
             sheet,
@@ -424,8 +439,8 @@ function estraiAnnoCategoria(sheet) {
     return { anno, categoria };
 }
 
-async function estraiStoricoPilota(sheet, pilotaNome) {
-    const storico = [];
+// MODIFICA: Aggiornata per usare il numero effettivo di gare
+async function estraiStoricoPilota(sheet, pilotaNome, numeroGareStagione) {
     const range = XLSX.utils.decode_range(sheet['!ref']);
     let startRow = -1;
 
@@ -442,30 +457,19 @@ async function estraiStoricoPilota(sheet, pilotaNome) {
         return null;
     }
 
-    // MODIFICA: Estraiamo solo fino alla colonna delle gare, non oltre
+    // Calcola il numero massimo di colonne da estrarre
     // Colonne: 0=Pilota, 1=Punti, 2=Scuderia, 3+=Gare
-    let maxColonneGare = 0;
+    const maxColonne = 3 + numeroGareStagione; // Base + gare
     
-    // Prima troviamo quante colonne di gare ci sono
-    for (let C = 3; C <= range.e.c; ++C) {
-        const cellHeader = sheet[XLSX.utils.encode_cell({c: C, r: startRow})];
-        if (!cellHeader || !cellHeader.v || cellHeader.v.toString().trim() === '') {
-            break;
-        }
-        maxColonneGare = C;
-    }
-    
-    // Se non abbiamo trovato colonne di gare, usiamo un limite ragionevole
-    if (maxColonneGare === 0) {
-        maxColonneGare = Math.min(range.e.c, 25); // Massimo 25 gare
-    }
+    console.log(`📊 Per ${pilotaNome}: ${numeroGareStagione} gare di stagione (colonne totali: ${maxColonne})`);
 
-    for (let C = 0; C <= maxColonneGare; ++C) {
+    const storico = [];
+    for (let C = 0; C <= maxColonne; ++C) {
         const cell = sheet[XLSX.utils.encode_cell({c: C, r: startRow})];
         storico.push(cell ? cell.v : null);
     }
     
-    console.log(`Storico per ${pilotaNome}:`, storico.length, "colonne -", storico);
+    console.log(`Storico per ${pilotaNome}:`, storico.length, "colonne - prime 10:", storico.slice(0, 10));
     return storico;
 }
 
@@ -659,14 +663,19 @@ function calcolaClassificaFinale(classificaPiloti, sheet) {
     }
 }
 
-// MODIFICA: Aggiornata per usare classificaFinale invece di classificaPiloti
-function aggiornaStatistiche(sheet, storicoPilota, classificaFinale, anno) {
+// MODIFICA: Aggiornata per usare il numero corretto di gare
+function aggiornaStatistiche(sheet, storicoPilota, classificaFinale, anno, numeroGareStagione) {
     if (!storicoPilota) return;
     
     const nome = storicoPilota[0];
     const punti = Number(storicoPilota[1]) || 0;
     const moto = storicoPilota[2] || "N/D";
+    
+    // Prendi solo le colonne delle gare (dalla colonna 3 in poi)
     const gare = storicoPilota.slice(3);
+    
+    console.log(`📊 ${anno}: ${nome} - ${gare.length} gare nel file (stagione: ${numeroGareStagione} gare)`);
+    
     const [poles, fl] = getPole(sheet, nome);
 
     const pilota = (nome==="Manuel Bonelli") ? M : L;
@@ -675,8 +684,13 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaFinale, anno) {
     pilota.FL += fl;
     pilota.Moto = moto;
 
-    for (let g of gare) {
-        // MODIFICA: Conta SOLO le gare con "RIT" o numeri (gare partecipate)
+    // Considera solo il numero effettivo di gare della stagione
+    const gareDaConsiderare = Math.min(gare.length, numeroGareStagione);
+    
+    for (let i = 0; i < gareDaConsiderare; i++) {
+        const g = gare[i];
+        
+        // Conta SOLO le gare con "RIT" o numeri (gare partecipate)
         // Celle vuote = gara non ancora disputata → NON conta
         // NP = non partecipato → NON conta
         if (g === 'RIT' || g === 'rit' || (g != null && g !== '' && !isNaN(Number(g)))) {
@@ -695,7 +709,7 @@ function aggiornaStatistiche(sheet, storicoPilota, classificaFinale, anno) {
         // NP = non contano (esplicitamente non partecipato)
     }
     
-    // MODIFICA: Aggiorna i mondiali solo se la classifica finale è disponibile
+    // Aggiorna i mondiali solo se la classifica finale è disponibile
     if (classificaFinale && classificaFinale.length > 0) {
         try {
             if (verificaVincitoreCampionato(nome, classificaFinale)) {
@@ -924,7 +938,7 @@ function createTabellaPilota(pilota) {
     return container;
 }
 
-// MODIFICA: Aggiornata per gestire campionati in corso vs completati
+// MODIFICA: Aggiornata per gestire il numero corretto di gare
 function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, sheet, gareInfo, campionatoCompletato) {
     if (!storicoPilota) {
         const errorDiv = document.createElement('div');
@@ -935,7 +949,15 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
     const nome = storicoPilota[0];
     const puntiTot = storicoPilota[1] || 0;
     const moto = formattaNomeTeam(storicoPilota[2] || "N/D");
-    const gareRisultati = storicoPilota.slice(3);
+    
+    // Prendi solo il numero effettivo di gare basato su gareInfo
+    const gareRisultati = storicoPilota.slice(3, 3 + gareInfo.length);
+    
+    // Se ci sono meno risultati che gare, riempi con '-'
+    while (gareRisultati.length < gareInfo.length) {
+        gareRisultati.push('-');
+    }
+    
     const posizione = campionatoCompletato ? calcolaPosizioneInClassifica(nome, classificaPiloti, sheet) : "-";
 
     // --- CREA LA TABELLA ---
@@ -992,9 +1014,8 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
     wrapper.className = "wikitable-wrapper";
     wrapper.appendChild(table);
 
-    return wrapper; // restituisce il wrapper, non la tabella
+    return wrapper;
 }
-
 
 // Avvio
 document.addEventListener('DOMContentLoaded', function() {
