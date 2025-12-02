@@ -211,12 +211,103 @@ document.addEventListener("DOMContentLoaded", () => {
                     date: '14-16 Novembre 2025'
                 }
             };
-        } else {
+        } else if (anno === '2026') {
             // Dati per il 2026
+            return {
+                'buriram': {
+                    image: '../../immagini/piste/buriram.jpg',
+                    date: '27 Febbraio - 1 Marzo 2026'
+                },
+                'termas': {  
+                    image: '../../immagini/piste/termas.jpg',
+                    date: '20-22 Marzo 2026'
+                },
+                'americhe': {
+                    image: '../../immagini/piste/americhe.jpg',
+                    date: '27-29 Marzo 2026'
+                },
+                'lusail': {
+                    image: '../../immagini/piste/lusail.jpg',
+                    date: '10-12 Aprile 2026'
+                },
+                'jerez': {
+                    image: '../../immagini/piste/jerez.jpg',
+                    date: '24-26 Aprile 2026'
+                },
+                'lemans': {
+                    image: '../../immagini/piste/lemans.jpg',
+                    date: '8-10 Maggio 2026'
+                },
+                'catalogna': {
+                    image: '../../immagini/piste/catalogna.jpg',
+                    date: '15-17 Maggio 2026'
+                },
+                'mugello': {
+                    image: '../../immagini/piste/mugello.jpg',
+                    date: '29-31 Maggio 2026'
+                },
+                'sokol': { 
+                    image: '../../immagini/piste/sokol.jpg',
+                    date: '5-7 Giugno 2026'
+                },
+                'brno': {
+                    image: '../../immagini/piste/brno.jpg',
+                    date: '19-21 Giugno 2026'
+                },
+                'assen': {
+                    image: '../../immagini/piste/assen.jpg',
+                    date: '26-28 Giugno 2026'
+                },
+                'sachsenring': {
+                    image: '../../immagini/piste/sachsenring.jpg',
+                    date: '10-12 Luglio 2026'
+                },
+                'silverstone': {
+                    image: '../../immagini/piste/silverstone.jpg',
+                    date: '7-9 Agosto 2026'
+                },
+                'aragon': {
+                    image: '../../immagini/piste/aragon.jpg',
+                    date: '28-30 Agosto 2026'
+                },
+                'misano': {
+                    image: '../../immagini/piste/misano.jpg',
+                    date: '11-13 Settembre 2026'
+                },
+                'redbullring': {
+                    image: '../../immagini/piste/redbullring.jpg',
+                    date: '18-20 Settembre 2026'
+                },
+                'motegi': {
+                    image: '../../immagini/piste/motegi.jpg',
+                    date: '2-4 Ottobre 2026'
+                },
+                'mandalika': {
+                    image: '../../immagini/piste/mandalika.jpg',
+                    date: '11 Ottobre 2026'
+                },
+                'phillipisland': {
+                    image: '../../immagini/piste/phillipisland.jpg',
+                    date: '25 Ottobre 2026'
+                },
+                'sepang': {
+                    image: '../../immagini/piste/sepang.jpg',
+                    date: '30 Ottobre - 1 Novembre 2026'
+                },
+                'portimao': {
+                    image: '../../immagini/piste/portimao.jpg',
+                    date: '13-15 Novembre 2026'
+                },
+                'valencia': {
+                    image: '../../immagini/piste/valencia.jpg',
+                    date: '20-22 Novembre 2026'
+                }
+            };
+        } else{
             return {
                 // Aggiungi i dati delle piste per il 2026 qui
             };
-        }   
+        }
     }
     // Mappa delle piste con immagini e date
     const trackData = getTrackDatas(getAnno());
