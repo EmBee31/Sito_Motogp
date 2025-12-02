@@ -422,20 +422,72 @@ function mostraRisultatiNelDOM(risultati) {
 
 // Le altre funzioni rimangono UGUALI
 function estraiAnnoCategoria(sheet) {
-    const cellA1 = sheet['A1'];
-    if (!cellA1 || !cellA1.v) {
-        return { anno: "2024", categoria: "Moto3" };
+    const range = XLSX.utils.decode_range(sheet['!ref']);
+    
+    // Cerca la riga che contiene "STAGIONE"
+    let rigaIntestazione = -1;
+    let testoIntestazione = '';
+    
+    for (let R = range.s.r; R <= range.e.r; ++R) {
+        for (let C = range.s.c; C <= range.e.c; ++C) {
+            const cell = sheet[XLSX.utils.encode_cell({c: C, r: R})];
+            if (cell && cell.v) {
+                const testo = cell.v.toString();
+                if (testo.toUpperCase().includes('STAGIONE')) {
+                    rigaIntestazione = R;
+                    testoIntestazione = testo;
+                    console.log(`✅ Trovata intestazione: "${testoIntestazione}" alla riga ${R}`);
+                    break;
+                }
+            }
+        }
+        if (rigaIntestazione !== -1) break;
     }
     
-    const testo = cellA1.v.toString().toUpperCase();
+    if (rigaIntestazione === -1 || !testoIntestazione) {
+        console.log("❌ Intestazione 'STAGIONE' non trovata");
+        return { anno: "ND", categoria: "ND" };
+    }
     
-    const annoMatch = testo.match(/\b(20\d{2})\b/);
-    const anno = annoMatch ? annoMatch[1] : "2024";
+    let anno = "ND";
+    let categoria = "ND";
     
-    const categoriaMatch = testo.match(/MOTO\s*(\d+)/i);
-    const categoria = categoriaMatch ? `Moto${categoriaMatch[1]}` : "Moto3";
+    // Estrai anno: cerca 4 cifre dopo "STAGIONE"
+    const matchAnno = testoIntestazione.match(/STAGIONE\s+(\d{4})/i);
+    if (matchAnno) {
+        anno = matchAnno[1];
+    }
     
-    console.log("Anno estratto:", anno, "Categoria:", categoria);
+    // Cerca la categoria dopo i due punti
+    const parti = testoIntestazione.split(':');
+    if (parti.length >= 2) {
+        categoria = parti[1].trim();
+        
+        // Normalizza la categoria
+        categoria = categoria
+            .replace(/\s+/g, '')  // Rimuovi tutti gli spazi
+            .replace(/^moto/i, 'Moto')  // Capitalizza "Moto"
+            .replace(/gp$/i, 'GP');     // Mantieni "GP" maiuscolo
+            
+        // Se dopo la normalizzazione è "MotoGP", lascialo così
+        if (categoria.toLowerCase() === 'motogp') {
+            categoria = 'MotoGP';
+        }
+    }
+    
+    // Se ancora non trova, cerca nella stringa intera
+    if (categoria === '' || categoria === 'ND') {
+        const matchCategoria = testoIntestazione.match(/(Moto\s*\d+|Moto\s*GP)/i);
+        if (matchCategoria) {
+            categoria = matchCategoria[1]
+                .replace(/\s+/g, '')  // Rimuovi spazi
+                .replace(/^moto/i, 'Moto')
+                .replace(/gp$/i, 'GP');
+        }
+    }
+    
+    console.log(`✅ Estratto: Anno "${anno}", Categoria "${categoria}"`);
+    
     return { anno, categoria };
 }
 
@@ -960,6 +1012,13 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
     
     const posizione = campionatoCompletato ? calcolaPosizioneInClassifica(nome, classificaPiloti, sheet) : "-";
 
+    // Normalizza la categoria per il controllo
+    const categoriaNormalizzata = categoria
+        .replace(/\s+/g, '')  // Rimuovi spazi
+        .toLowerCase();        // Converti in minuscolo
+    
+    console.log(`📊 Categoria normalizzata per tabella: "${categoria}" → "${categoriaNormalizzata}"`);
+
     // --- CREA LA TABELLA ---
     const table = document.createElement('table');
     table.className = "wikitable";
@@ -969,45 +1028,114 @@ function createTabellaStorico(storicoPilota, anno, categoria, classificaPiloti, 
     table.style.tableLayout = 'fixed';
 
     const header = document.createElement('tr');
-    header.innerHTML = `
-        <th style="width: 80px; height: 60px;">Anno</th>
-        <th style="width: 100px; height: 60px;">Categoria</th>
-        <th style="width: 120px; height: 60px;">Moto</th>
-    `;
+    
+    // LARGHEZZE DIVERSIFICATE PER CATEGORIA
+    if (categoriaNormalizzata === 'moto3') {
+        console.log(`🎯 Creazione tabella Moto3 per ${anno}`);
+        // TABELLA MOTO3 - LARGHEZZE MANUALI (PIÙ COMPATTE)
+        header.innerHTML = `
+            <th style="width: 83px; height: 60px;">Anno</th>
+            <th style="width: 100.5px; height: 60px;">Categoria</th>
+            <th style="width: 118px; height: 60px;">Moto</th>
+        `;
 
-    const larghezzaGara = Math.max(50, Math.floor((100 - 300) / gareInfo.length));
-    for (let g of gareInfo) {
-        header.innerHTML += `<th style="width: ${larghezzaGara}px; height: 60px;">
-            <img src="${g.img}" width="40" height="20" alt="${g.nome}" title="${g.nome}">
-        </th>`;
+        // Per Moto3, larghezza fissa delle colonne gara
+        const larghezzaGaraMoto3 = 65; // Larghezza fissa per Moto3
+        
+        for (let g of gareInfo) {
+            header.innerHTML += `<th style="width: ${larghezzaGaraMoto3}px; height: 60px;">
+                <img src="${g.img}" width="35" height="17" alt="${g.nome}" title="${g.nome}">
+            </th>`;
+        }
+
+        header.innerHTML += `<th style="width: 95px; height: 60px;">Punti</th><th style="width: 70.5px; height: 60px;">Pos.</th>`;
+        table.appendChild(header);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="height: 50px; width: 70px;">${anno}</td>
+            <td style="height: 50px; width: 80px;">${categoria}</td>
+            <td style="height: 50px; width: 100px;">${moto}</td>
+        `;
+
+        for (let i = 0; i < gareInfo.length; i++) {
+            const pos = gareRisultati[i] != null ? gareRisultati[i] : '-';
+            let classe = '';
+
+            if (pos === 1) classe = 'posizione-1';
+            else if (pos === 2) classe = 'posizione-2';
+            else if (pos === 3) classe = 'posizione-3';
+            else if (pos >= 4 && pos <= 15) classe = 'posizione-punti';
+            else if (pos === 'RIT' || pos === 'rit') classe = 'ritirato';
+            else if (pos === '-' || pos === null || pos === '') classe = 'non-classificato';
+
+            row.innerHTML += `<td class="${classe}" style="height: 50px; width: ${larghezzaGaraMoto3}px;">${pos !== '-' ? pos : '-'}</td>`;
+        }
+
+        row.innerHTML += `<td style="height: 50px; width: 60px;">${puntiTot}</td><td style="height: 50px; width: 50px;">${posizione}${campionatoCompletato ? '°' : ''}</td>`;
+        table.appendChild(row);
+        
+    } else {
+        console.log(`🏍️ Creazione tabella ${categoria} per ${anno}`);
+        // TABELLE PER MOTO2/MotoGP - LARGHEZZE RIDOTTE PER ANNO/CATEGORIA/MOTO
+        header.innerHTML = `
+            <th style="width: 70px; height: 60px;">Anno</th>          <!-- Ridotto da 80px -->
+            <th style="width: 85px; height: 60px;">Categoria</th>     <!-- Ridotto da 100px -->
+            <th style="width: 100px; height: 60px;">Moto</th>         <!-- Ridotto da 120px -->
+        `;
+
+        // Calcola larghezza gara con nuove larghezze fisse ridotte
+        const larghezzaFissaTotale = 70 + 85 + 100 + 80 + 60; // Anno + Categoria + Moto + Punti + Pos
+        const larghezzaDisponibile = 100 - larghezzaFissaTotale;
+        
+        const larghezzaGaraMinima = 50;
+        const larghezzaGaraMassima = 75;
+        
+        let larghezzaGara;
+        if (gareInfo.length > 0) {
+            const larghezzaCalcolata = larghezzaDisponibile / gareInfo.length;
+            // Limita la larghezza tra minimo e massimo
+            larghezzaGara = Math.max(larghezzaGaraMinima, Math.min(larghezzaGaraMassima, larghezzaCalcolata));
+        } else {
+            larghezzaGara = larghezzaGaraMinima;
+        }
+        
+        // Arrotonda per eccesso per evitare decimali
+        larghezzaGara = Math.ceil(larghezzaGara);
+        
+        for (let g of gareInfo) {
+            header.innerHTML += `<th style="width: ${larghezzaGara}px; height: 60px; min-width: ${larghezzaGaraMinima}px; max-width: ${larghezzaGaraMassima}px;">
+                <img src="${g.img}" width="38" height="19" alt="${g.nome}" title="${g.nome}">
+            </th>`;
+        }
+
+        header.innerHTML += `<th style="width: 80px; height: 60px;">Punti</th><th style="width: 60px; height: 60px;">Pos.</th>`;
+        table.appendChild(header);
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+            <td style="height: 50px; width: 70px;">${anno}</td>
+            <td style="height: 50px; width: 85px;">${categoria}</td>
+            <td style="height: 50px; width: 100px;">${moto}</td>
+        `;
+
+        for (let i = 0; i < gareInfo.length; i++) {
+            const pos = gareRisultati[i] != null ? gareRisultati[i] : '-';
+            let classe = '';
+
+            if (pos === 1) classe = 'posizione-1';
+            else if (pos === 2) classe = 'posizione-2';
+            else if (pos === 3) classe = 'posizione-3';
+            else if (pos >= 4 && pos <= 15) classe = 'posizione-punti';
+            else if (pos === 'RIT' || pos === 'rit') classe = 'ritirato';
+            else if (pos === '-' || pos === null || pos === '') classe = 'non-classificato';
+
+            row.innerHTML += `<td class="${classe}" style="height: 50px; width: ${larghezzaGara}px; min-width: ${larghezzaGaraMinima}px; max-width: ${larghezzaGaraMassima}px;">${pos !== '-' ? pos : '-'}</td>`;
+        }
+
+        row.innerHTML += `<td style="height: 50px; width: 80px;">${puntiTot}</td><td style="height: 50px; width: 60px;">${posizione}${campionatoCompletato ? '°' : ''}</td>`;
+        table.appendChild(row);
     }
-
-    header.innerHTML += `<th style="width: 80px; height: 60px;">Punti</th><th style="width: 60px; height: 60px;">Pos.</th>`;
-    table.appendChild(header);
-
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td style="height: 50px;">${anno}</td>
-        <td style="height: 50px;">${categoria}</td>
-        <td style="height: 50px;">${moto}</td>
-    `;
-
-    for (let i = 0; i < gareInfo.length; i++) {
-        const pos = gareRisultati[i] != null ? gareRisultati[i] : '-';
-        let classe = '';
-
-        if (pos === 1) classe = 'posizione-1';
-        else if (pos === 2) classe = 'posizione-2';
-        else if (pos === 3) classe = 'posizione-3';
-        else if (pos >= 4 && pos <= 15) classe = 'posizione-punti';
-        else if (pos === 'RIT' || pos === 'rit') classe = 'ritirato';
-        else if (pos === '-' || pos === null || pos === '') classe = 'non-classificato';
-
-        row.innerHTML += `<td class="${classe}" style="height: 50px;">${pos !== '-' ? pos : '-'}</td>`;
-    }
-
-    row.innerHTML += `<td style="height: 50px;">${puntiTot}</td><td style="height: 50px;">${posizione}${campionatoCompletato ? '°' : ''}</td>`;
-    table.appendChild(row);
 
     // --- WRAPPER SCORRIBILE SOLO MOBILE ---
     const wrapper = document.createElement('div');
